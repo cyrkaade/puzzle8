@@ -1,6 +1,16 @@
 import Link from "next/link";
+import useRegisterModal from "../hooks/useRegisterModal";
+import { User } from "@prisma/client";
 
-export default function Header() {
+interface HeaderProps {
+  currentUser?: User | null
+}
+
+const Header: React.FC<HeaderProps> = ({
+  currentUser,
+}) => {
+  const registerModal = useRegisterModal();
+  console.log(currentUser)
   return (
     <header className="flex justify-between items-center w-full mt-5 border-b-2 pb-7 sm:px-4 px-2">
       <Link href="/" className="flex space-x-3">
@@ -15,9 +25,11 @@ export default function Header() {
           puzzle8.me
         </h1>
       </Link>
-      <button className="bg-black text-white rounded py-2 px-4">
+      <button className="bg-black text-white rounded py-2 px-4" onClick={registerModal.onOpen}>
         Sign Up
       </button>
     </header>
   );
 }
+
+export default Header

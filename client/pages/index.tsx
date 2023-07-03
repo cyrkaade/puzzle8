@@ -1,7 +1,7 @@
-import type { NextPage } from "next";
+import type { NextPage, GetServerSideProps } from "next";
 import Head from "next/head";
 import Image from "next/image";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { Toaster, toast } from "react-hot-toast";
 import DropDown, { PuzzleType } from "../components/DropDown";
 import Footer from "../components/Footer";
@@ -14,6 +14,17 @@ import {
   ParsedEvent,
   ReconnectInterval,
 } from "eventsource-parser";
+import RegisterModal from "../components/RegisterModal";
+import LoginModal from "../components/LoginModal";
+import getCurrentUser from "../actions/getCurrentUser";
+import { User } from "@prisma/client";
+import { log } from "console"
+import { useQuery } from 'react-query';
+
+
+interface HomeProps {
+  currentUser: User | null;
+}
 
 const Home: NextPage = () => {
   const [loading, setLoading] = useState(false);
@@ -53,7 +64,6 @@ const Home: NextPage = () => {
       throw new Error(response.statusText);
     }
 
-    // This data is a ReadableStream
     const data = response.body;
     if (!data) {
       return;
@@ -71,7 +81,6 @@ const Home: NextPage = () => {
       }
     }
 
-    // https://web.dev/streams/#the-getreader-and-read-methods
     const reader = data.getReader();
     const decoder = new TextDecoder();
     const parser = createParser(onParse);
@@ -86,14 +95,16 @@ const Home: NextPage = () => {
     setLoading(false);
   };
 
+
   return (
     <div className="flex max-w-5xl mx-auto flex-col items-center justify-center py-2 min-h-screen">
       <Head>
         <title>Puzzle8</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
-
-      <Header />
+      <RegisterModal/>
+      <LoginModal/>
+      <Header/>
       <main className="flex flex-1 w-full flex-col items-center justify-center text-center px-4 mt-12 sm:mt-20">
         <a
           className="flex max-w-fit items-center justify-center space-x-2 rounded-full border border-gray-300 bg-white px-4 py-2 text-sm text-gray-600 shadow-md transition-colors hover:bg-gray-100 mb-5"
