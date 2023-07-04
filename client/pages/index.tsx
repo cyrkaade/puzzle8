@@ -20,13 +20,11 @@ import getCurrentUser from "../actions/getCurrentUser";
 import { User } from "@prisma/client";
 import { log } from "console"
 import { useQuery } from 'react-query';
+import axios from 'axios';
 
-
-interface HomeProps {
-  currentUser: User | null;
-}
 
 const Home: NextPage = () => {
+
   const [loading, setLoading] = useState(false);
   const [style, setStyle] = useState("");
   const [ptype, setType] = useState<PuzzleType>("Riddle");
@@ -34,6 +32,19 @@ const Home: NextPage = () => {
   const [generatedPuzzles, setGeneratedPuzzles] = useState<String>("");
 
   const puzzleRef = useRef<null | HTMLDivElement>(null);
+  const [currentUser, setCurrentUser] = useState(null);
+
+  useEffect(() => {
+    fetch('/api/currentUser')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.user) {
+          setCurrentUser(data.user);
+        } else {
+          console.error(data.error);
+        }
+      });
+  }, []);
 
   const scrollToPuzzles = () => {
     if (puzzleRef.current !== null) {
@@ -104,7 +115,7 @@ const Home: NextPage = () => {
       </Head>
       <RegisterModal/>
       <LoginModal/>
-      <Header/>
+      <Header currentUser={currentUser}/>
       <main className="flex flex-1 w-full flex-col items-center justify-center text-center px-4 mt-12 sm:mt-20">
         <a
           className="flex max-w-fit items-center justify-center space-x-2 rounded-full border border-gray-300 bg-white px-4 py-2 text-sm text-gray-600 shadow-md transition-colors hover:bg-gray-100 mb-5"
