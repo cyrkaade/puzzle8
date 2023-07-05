@@ -2,6 +2,7 @@ import Link from "next/link";
 import useRegisterModal from "../hooks/useRegisterModal";
 import { User } from "@prisma/client";
 import { signOut } from "next-auth/react";
+import { FaHeart } from 'react-icons/fa';
 
 interface HeaderProps {
   currentUser?: User | null
@@ -26,11 +27,20 @@ const Header: React.FC<HeaderProps> = ({
           puzzle8.me
         </h1>
       </Link>
-      {currentUser ? (<button className="bg-black text-white rounded py-2 px-4" onClick={()=>signOut()}>
+      <div className="flex items-center">
+        {currentUser && (
+          <Link href="/favorites">
+            <div className="mr-4 cursor-pointer">
+              <FaHeart className="w-6 h-6" />
+            </div>
+          </Link>
+        )}
+        {currentUser ? (<button className="bg-black text-white rounded py-2 px-4" onClick={()=>signOut()}>
         Sign Out
       </button>) : (<button className="bg-black text-white rounded py-2 px-4" onClick={registerModal.onOpen}>
         Sign Up
       </button>)}
+      </div>
     </header>
   );
 }

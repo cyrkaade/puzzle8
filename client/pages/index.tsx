@@ -16,12 +16,63 @@ import {
 } from "eventsource-parser";
 import RegisterModal from "../components/RegisterModal";
 import LoginModal from "../components/LoginModal";
-import getCurrentUser from "../actions/getCurrentUser";
-import { User } from "@prisma/client";
-import { log } from "console"
-import { useQuery } from 'react-query';
-import axios from 'axios';
+import { FaRegHeart, FaHeart } from 'react-icons/fa';
 
+
+interface PuzzleItemProps {
+  generatedpuzzle: string;
+  currentUser: any;
+}
+
+const PuzzleItem: React.FC<PuzzleItemProps> = ({ generatedpuzzle, currentUser }) => {
+  const [isFavorited, setFavorited] = useState(false);
+  const API_URL = 'http://localhost:8000';
+  return (
+    <div
+      className="bg-white rounded-xl shadow-md p-4 hover:bg-gray-100 transition cursor-copy border flex items-center"
+      onClick={() => {
+        navigator.clipboard.writeText(generatedpuzzle);
+        toast("puzzle copied to clipboard", { icon: "✂️" });
+      }}
+    >
+      {currentUser && (
+      <div
+        className={`w-6 h-6 mr-4 text-purple-700 cursor-pointer transition duration-500 ease-in-out transform items-center ${isFavorited ? "scale-125" : ""}`}
+        onClick={(e) => {
+          e.stopPropagation();
+          setFavorited(!isFavorited);
+          if (isFavorited) {
+            fetch(`${API_URL}/favorites`, {
+              method: 'DELETE',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                user_id: currentUser?.email,
+                puzzle: generatedpuzzle
+              })
+            });
+          } else {
+            fetch(`${API_URL}/favorites`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                user_id: currentUser?.email,
+                puzzle: generatedpuzzle
+              })
+            });
+          }
+        }}
+      >
+        {isFavorited ? <FaHeart /> : <FaRegHeart />}
+      </div>
+      )}
+      <p>{generatedpuzzle}</p>
+    </div>
+  );
+};
 
 const Home: NextPage = () => {
 
@@ -106,6 +157,8 @@ const Home: NextPage = () => {
     setLoading(false);
   };
 
+  
+
 
   return (
     <div className="flex max-w-5xl mx-auto flex-col items-center justify-center py-2 min-h-screen">
@@ -119,7 +172,7 @@ const Home: NextPage = () => {
       <main className="flex flex-1 w-full flex-col items-center justify-center text-center px-4 mt-12 sm:mt-20">
         <a
           className="flex max-w-fit items-center justify-center space-x-2 rounded-full border border-gray-300 bg-white px-4 py-2 text-sm text-gray-600 shadow-md transition-colors hover:bg-gray-100 mb-5"
-          href="https://github.com/Nutlope/twitterpuzzle"
+          href="https://github.com/cyrkaade/puzzle8"
           target="_blank"
           rel="noopener noreferrer"
         >
@@ -207,25 +260,13 @@ const Home: NextPage = () => {
                 </h2>
               </div>
               <div className="space-y-8 flex flex-col items-center justify-center max-w-xl mx-auto">
-                {generatedPuzzles
-                  .substring(generatedPuzzles.indexOf("1") + 3)
-                  .split("2.")
-                  .map((generatedpuzzle) => {
-                    return (
-                      <div
-                        className="bg-white rounded-xl shadow-md p-4 hover:bg-gray-100 transition cursor-copy border"
-                        onClick={() => {
-                          navigator.clipboard.writeText(generatedpuzzle);
-                          toast("puzzle copied to clipboard", {
-                            icon: "✂️",
-                          });
-                        }}
-                        key={generatedpuzzle}
-                      >
-                        <p>{generatedpuzzle}</p>
-                      </div>
-                    );
-                  })}
+                
+              {generatedPuzzles
+              .substring(generatedPuzzles.indexOf("1") + 3)
+              .split("2.")
+              .map((generatedpuzzle, index) => (
+                <PuzzleItem generatedpuzzle={generatedpuzzle} key={index} currentUser={currentUser} />
+              ))}
               </div>
             </>
           )}
