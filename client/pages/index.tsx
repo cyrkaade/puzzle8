@@ -17,14 +17,16 @@ import {
 import RegisterModal from "../components/RegisterModal";
 import LoginModal from "../components/LoginModal";
 import { FaRegHeart, FaHeart } from 'react-icons/fa';
+import Cookies from 'js-cookie';
 
 
 interface PuzzleItemProps {
   generatedpuzzle: string;
   currentUser: any;
+  ptype: string;
 }
 
-const PuzzleItem: React.FC<PuzzleItemProps> = ({ generatedpuzzle, currentUser }) => {
+const PuzzleItem: React.FC<PuzzleItemProps> = ({ generatedpuzzle, currentUser, ptype }) => {
   const [isFavorited, setFavorited] = useState(false);
   const API_URL = 'http://localhost:8000';
   return (
@@ -49,7 +51,8 @@ const PuzzleItem: React.FC<PuzzleItemProps> = ({ generatedpuzzle, currentUser })
               },
               body: JSON.stringify({
                 user_id: currentUser?.email,
-                puzzle: generatedpuzzle
+                puzzle: generatedpuzzle,
+                puzzle_type: ptype
               })
             });
           } else {
@@ -60,7 +63,8 @@ const PuzzleItem: React.FC<PuzzleItemProps> = ({ generatedpuzzle, currentUser })
               },
               body: JSON.stringify({
                 user_id: currentUser?.email,
-                puzzle: generatedpuzzle
+                puzzle: generatedpuzzle,
+                puzzle_type: ptype
               })
             });
           }
@@ -85,18 +89,22 @@ const Home: NextPage = () => {
   const puzzleRef = useRef<null | HTMLDivElement>(null);
   const [currentUser, setCurrentUser] = useState(null);
 
+  console.log(ptype)
+
   useEffect(() => {
     fetch('/api/currentUser')
       .then((res) => res.json())
       .then((data) => {
         if (data.user) {
           setCurrentUser(data.user);
+          Cookies.remove('generationCount');
         } else {
           console.error(data.error);
         }
       });
   }, []);
 
+  
   const scrollToPuzzles = () => {
     if (puzzleRef.current !== null) {
       puzzleRef.current.scrollIntoView({ behavior: "smooth" });
@@ -112,6 +120,15 @@ const Home: NextPage = () => {
     e.preventDefault();
     setGeneratedPuzzles("");
     setLoading(true);
+    if (!currentUser) {
+      const generationCount = Cookies.get('generationCount') ? parseInt(Cookies.get('generationCount') as string) : 0;
+      if (generationCount >= 2) {
+        setLoading(false);
+        toast("I'm sorry, it seems like you've already used up all your generations. To get unlimited generations, please sign up.");
+        return;
+      }
+      Cookies.set('generationCount', (generationCount + 1).toString());
+    }
     const response = await fetch("/api/generate", {
       method: "POST",
       headers: {
@@ -265,7 +282,7 @@ const Home: NextPage = () => {
               .substring(generatedPuzzles.indexOf("1") + 3)
               .split("2.")
               .map((generatedpuzzle, index) => (
-                <PuzzleItem generatedpuzzle={generatedpuzzle} key={index} currentUser={currentUser} />
+                <PuzzleItem generatedpuzzle={generatedpuzzle} key={index} currentUser={currentUser} ptype={ptype.toLowerCase()} />
               ))}
               </div>
             </>
