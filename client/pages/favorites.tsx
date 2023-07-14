@@ -72,7 +72,7 @@
 "use client"
 
 import * as React from "react"
-import { useState, useEffect, useMemo } from "react"
+import { useState, useEffect, useMemo, useCallback } from "react"
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -108,6 +108,10 @@ import {
   TableRow,
 } from "../@/components/ui/table"
 
+import { Dialog, Transition } from '@headlessui/react'
+import { Fragment } from 'react'
+import axios from "axios"
+
 
 interface FavoriteItemProps {
   favorite: {
@@ -118,6 +122,7 @@ interface FavoriteItemProps {
 }
 
 export type Favorite = {
+  _id: string;
   user_id: string;
   puzzle: string;
   puzzle_type: string;
@@ -125,47 +130,6 @@ export type Favorite = {
 
 
 const API_URL = 'http://localhost:8000'; 
-
-
-const data: Payment[] = [
-  {
-    id: "m5gr84i9",
-    amount: 316,
-    status: "success",
-    email: "ken99@yahoo.com",
-  },
-  {
-    id: "3u1reuv4",
-    amount: 242,
-    status: "success",
-    email: "Abe45@gmail.com",
-  },
-  {
-    id: "derv1ws0",
-    amount: 837,
-    status: "processing",
-    email: "Monserrat44@gmail.com",
-  },
-  {
-    id: "5kma53ae",
-    amount: 874,
-    status: "success",
-    email: "Silas22@gmail.com",
-  },
-  {
-    id: "bhqecj4p",
-    amount: 721,
-    status: "failed",
-    email: "carmella@hotmail.com",
-  },
-]
- 
-export type Payment = {
-  id: string
-  amount: number
-  status: "pending" | "processing" | "success" | "failed"
-  email: string
-}
  
 export const columns: ColumnDef<Favorite>[] = [
   {
@@ -180,13 +144,22 @@ export const columns: ColumnDef<Favorite>[] = [
     cell: ({ row }) => (
       <Checkbox
         checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
+        onCheckedChange={(value) => {
+          
+          row.toggleSelected(!!value)
+        }}
         aria-label="Select row"
       />
     ),
     enableSorting: false,
     enableHiding: false,
   },
+  // {
+  //   accessorKey: "_id",
+  //   id: "_id",
+  //   header: "ID",
+  //   cell: ({ row }) => <div>{row.getValue("_id")}</div>,
+  // },
     {
       accessorKey: "puzzle_type",
       header: "Puzzle Type",
@@ -194,51 +167,15 @@ export const columns: ColumnDef<Favorite>[] = [
     },
     {
       accessorKey: "puzzle",
+      id: 'puzzle',
       header: "Puzzle",
       cell: ({ row }) => <div>{row.getValue("puzzle")}</div>,
     },
-  // {
-  //   accessorKey: "status",
-  //   header: "Status",
-  //   cell: ({ row }) => (
-  //     <div className="capitalize">{row.getValue("status")}</div>
-  //   ),
-  // },
-  // {
-  //   accessorKey: "email",
-  //   header: ({ column }) => {
-  //     return (
-  //       <Button
-  //         variant="ghost"
-  //         onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-  //       >
-  //         Email
-  //         <ArrowUpDown className="ml-2 h-4 w-4" />
-  //       </Button>
-  //     )
-  //   },
-  //   cell: ({ row }) => <div className="lowercase">{row.getValue("email")}</div>,
-  // },
-  // {
-  //   accessorKey: "amount",
-  //   header: () => <div className="text-right">Amount</div>,
-  //   cell: ({ row }) => {
-  //     const amount = parseFloat(row.getValue("amount"))
- 
-  //     // Format the amount as a dollar amount
-  //     const formatted = new Intl.NumberFormat("en-US", {
-  //       style: "currency",
-  //       currency: "USD",
-  //     }).format(amount)
- 
-  //     return <div className="text-right font-medium">{formatted}</div>
-  //   },
-  // },
   {
     id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
-      const payment = row.original
+      const puzzle = row.original
  
       return (
         <DropdownMenu>
@@ -251,13 +188,11 @@ export const columns: ColumnDef<Favorite>[] = [
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(payment.id)}
+              onClick={() => navigator.clipboard.writeText(puzzle.puzzle)}
             >
-              Copy payment ID
+              Copy puzzle text
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>View customer</DropdownMenuItem>
-            <DropdownMenuItem>View payment details</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       )
@@ -273,25 +208,32 @@ export default function DataTableDemo() {
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = React.useState({})
+  const [selectedRows, setSelectedRows] = useState<Favorite[]>([]);
   const [favorites, setFavorites] = useState<Favorite[]>([]);
-  const [currentUser, setCurrentUser] = useState(null)
-  const [filterInput, setFilterInput] = useState("");
+  const [currentUser, setCurrentUser] = useState<{ email: string } | null>(null)
+  const [dataChanged, setDataChanged] = useState(false);
+  let [isOpen, setIsOpen] = useState(false)
+
+  
 
 
-  const handleFilterChange = e => {
-    const value = e.target.value || undefined;
-    setFilterInput(value);
-  };
+  function closeModal() {
+    setIsOpen(false)
+  }
 
+  function openModal() {
+    setIsOpen(true)
+  }
+  
 
-  const filteredData = useMemo(() => {
-    if (!filterInput) return favorites;
-
-    // Filter the data based on filter input
-    return favorites.filter((row) => 
-        row.puzzle.toLowerCase().includes(filterInput.toLowerCase())
-    );
-  }, [favorites, filterInput]);
+  useEffect(() => {
+    // Log the rowSelection state to understand its structure
+    console.log('rowSelection:', rowSelection);
+    console.log(rowSelection)
+  
+    // Assuming rowSelection is an array of selected row objects
+    setSelectedRows(Object.values(rowSelection));
+  }, [rowSelection]);
 
 
   useEffect(() => {
@@ -300,6 +242,7 @@ export default function DataTableDemo() {
       .then((data) => {
         if (data.user) {
           setCurrentUser(data.user);
+          // console.log
         } else {
           console.error(data.error);
         }
@@ -315,10 +258,35 @@ export default function DataTableDemo() {
           setFavorites(data);
         });
     }
-}, [currentUser]);
+}, [currentUser, dataChanged]);
+
+
+
+
+const deleteFavorites = async () => {
+  const selectedFavoritesIds = Object.keys(rowSelection).map(index => favorites[+index]._id);
+
+  for (let favoriteId of selectedFavoritesIds) {
+    const response = await fetch(`${API_URL}/favorites/${favoriteId}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to delete favorite with ID ${favoriteId}`);
+    }
+  }
+  closeModal();
+  setDataChanged(!dataChanged);
+}
+
+
+
 
   const table = useReactTable({
-    data: filteredData,
+    data: favorites,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -341,11 +309,81 @@ export default function DataTableDemo() {
       <div className="flex items-center py-4">
         <Input
           placeholder="Search puzzles..."
-          value={filterInput}
-          onChange={handleFilterChange}
+          value={(table.getColumn("puzzle")?.getFilterValue() as string) ?? ""}
+          onChange={(event) =>
+            table.getColumn("puzzle")?.setFilterValue(event.target.value)
+          }
           className="max-w-sm"
-      
         />
+        <Button variant="outline" 
+        className={`ml-auto ${selectedRows.length === 0 ? 'bg-black text-white cursor-not-allowed bg-opacity-60' : 'bg-black text-white'}`} 
+        onClick={selectedRows.length > 0 ? openModal : undefined}
+        disabled={selectedRows.length === 0}>
+              Delete
+          </Button>
+    <>
+      <Transition appear show={isOpen} as={Fragment}>
+        <Dialog as="div" className="relative z-10" onClose={closeModal}>
+          <Transition.Child
+            as={Fragment}
+            enter="ease-out duration-300"
+            enterFrom="opacity-0"
+            enterTo="opacity-100"
+            leave="ease-in duration-200"
+            leaveFrom="opacity-100"
+            leaveTo="opacity-0"
+          >
+            <div className="fixed inset-0 bg-black bg-opacity-25" />
+          </Transition.Child>
+
+          <div className="fixed inset-0 overflow-y-auto">
+            <div className="flex min-h-full items-center justify-center p-4 text-center">
+              <Transition.Child
+                as={Fragment}
+                enter="ease-out duration-300"
+                enterFrom="opacity-0 scale-95"
+                enterTo="opacity-100 scale-100"
+                leave="ease-in duration-200"
+                leaveFrom="opacity-100 scale-100"
+                leaveTo="opacity-0 scale-95"
+              >
+                <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+                  <Dialog.Title
+                    as="h3"
+                    className="text-lg font-medium leading-6 text-gray-900"
+                  >
+                    Are you sure to delete?
+                  </Dialog.Title>
+                  <div className="mt-2">
+                    <p className="text-sm text-gray-500">
+                      Action is unreversible.
+                    </p>
+                  </div>
+
+                  <div className="mt-4">
+                    <button
+                      type="button"
+                      className="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                      onClick={deleteFavorites}
+                    >
+                      Delete
+                    </button>
+                    <button
+                      type="button"
+                      className="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                      onClick={closeModal}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </Dialog.Panel>
+              </Transition.Child>
+            </div>
+          </div>
+        </Dialog>
+      </Transition>
+    </>
+        
         <DropdownMenu>
           
           <DropdownMenuTrigger asChild>

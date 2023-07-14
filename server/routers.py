@@ -32,3 +32,11 @@ def get_favorites(user_id: str):
     favorites_list = [convert_mongo_doc(favorite) for favorite in favorites]
     return favorites_list
 
+@router.delete("/favorites/{favorite_id}")
+def remove_favorite(favorite_id: str):
+    result = config.favorites_collection.delete_one({"_id": ObjectId(favorite_id)})
+    if result.deleted_count:
+        return {"message": "Favorite removed successfully"}
+    else:
+        raise HTTPException(status_code=400, detail="Failed to remove favorite")
+
