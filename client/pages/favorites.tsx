@@ -111,6 +111,7 @@ import {
 import { Dialog, Transition } from '@headlessui/react'
 import { Fragment } from 'react'
 import axios from "axios"
+import Header from "../components/navbar/Header"
 
 
 interface FavoriteItemProps {
@@ -190,7 +191,7 @@ export const columns: ColumnDef<Favorite>[] = [
             <DropdownMenuItem
               onClick={() => navigator.clipboard.writeText(puzzle.puzzle)}
             >
-              Copy puzzle text
+              Copy puzzle
             </DropdownMenuItem>
             <DropdownMenuSeparator />
           </DropdownMenuContent>
@@ -210,7 +211,18 @@ export default function DataTableDemo() {
   const [rowSelection, setRowSelection] = React.useState({})
   const [selectedRows, setSelectedRows] = useState<Favorite[]>([]);
   const [favorites, setFavorites] = useState<Favorite[]>([]);
-  const [currentUser, setCurrentUser] = useState<{ email: string } | null>(null)
+  const [currentUser, setCurrentUser] = useState<{
+    id: string;
+    name: string | null;
+    email: string | null;
+    emailVerified: Date | null;
+    image: string | null;
+    hashedPassword: string | null;
+    createdAt: Date;
+    updatedAt: Date;
+    rating: number;
+    favoriteIds: string[];
+  } | null>(null);
   const [dataChanged, setDataChanged] = useState(false);
   let [isOpen, setIsOpen] = useState(false)
 
@@ -305,6 +317,9 @@ const deleteFavorites = async () => {
   })
  
   return (
+    <div>
+      
+      <Header currentUser={currentUser}/>
     <div className="w-full">
       <div className="flex items-center py-4">
         <Input
@@ -316,7 +331,7 @@ const deleteFavorites = async () => {
           className="max-w-sm"
         />
         <Button variant="outline" 
-        className={`ml-auto ${selectedRows.length === 0 ? 'bg-black text-white cursor-not-allowed bg-opacity-60' : 'bg-black text-white'}`} 
+        className={`ml-auto mr-20 sm:mr-80 ${selectedRows.length === 0 ? 'bg-black text-white cursor-not-allowed bg-opacity-60' : 'bg-black text-white hover:bg-opacity-80'}`} 
         onClick={selectedRows.length > 0 ? openModal : undefined}
         disabled={selectedRows.length === 0}>
               Delete
@@ -360,17 +375,17 @@ const deleteFavorites = async () => {
                     </p>
                   </div>
 
-                  <div className="mt-4">
+                  <div className="mt-4 flex space-x-2">
                     <button
                       type="button"
-                      className="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                      className="inline-flex justify-center rounded-md border border-transparent bg-purple-700 px-4 py-2 text-sm font-medium text-white hover:bg-purple-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2"
                       onClick={deleteFavorites}
                     >
                       Delete
                     </button>
                     <button
                       type="button"
-                      className="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                      className="inline-flex justify-center rounded-md border border-transparent bg-black px-4 py-2 text-sm font-medium text-white hover:bg-black hover:bg-opacity-70 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
                       onClick={closeModal}
                     >
                       Cancel
@@ -384,7 +399,7 @@ const deleteFavorites = async () => {
       </Transition>
     </>
         
-        <DropdownMenu>
+        {/* <DropdownMenu>
           
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="ml-auto">
@@ -410,7 +425,7 @@ const deleteFavorites = async () => {
                 )
               })}
           </DropdownMenuContent>
-        </DropdownMenu>
+        </DropdownMenu> */}
       </div>
       <div className="rounded-md border">
         <Table>
@@ -486,6 +501,7 @@ const deleteFavorites = async () => {
           </Button>
         </div>
       </div>
+    </div>
     </div>
   )
 }

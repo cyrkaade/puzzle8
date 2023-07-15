@@ -1,4 +1,3 @@
-import { OpenAIStream, OpenAIStreamPayload } from "../../utils/OpenAIStream";
 import { OpenAIStreamRanked, OpenAIStreamPayloadRanked } from "../../utils/OpenAIStreamRanked";
 
 
@@ -11,17 +10,17 @@ export const config = {
 };
 
 const handler = async (req: Request): Promise<Response> => {
-  const { prompt } = (await req.json()) as {
-    prompt?: string;
+  const { answer_prompt } = (await req.json()) as {
+    answer_prompt?: string;
   };
 
-  if (!prompt) {
+  if (!answer_prompt) {
     return new Response("No prompt in the request", { status: 400 });
   }
 
-  const payload: OpenAIStreamPayload = {
+  const payload: OpenAIStreamPayloadRanked = {
     model: "gpt-3.5-turbo",
-    messages: [{ role: "user", content: prompt }],
+    messages: [{ role: "user", content: answer_prompt }],
     temperature: 0.7,
     top_p: 1,
     frequency_penalty: 0,
@@ -31,7 +30,7 @@ const handler = async (req: Request): Promise<Response> => {
     n: 1,
   };
 
-  const stream = await OpenAIStream(payload);
+  const stream = await OpenAIStreamRanked(payload);
   // return stream response (SSE)
   return new Response(
     stream, {

@@ -51,6 +51,7 @@ export const authOptions: AuthOptions = {
       }
     })
   ],
+  
   pages: {
     signIn: '/',
   },

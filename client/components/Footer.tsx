@@ -6,21 +6,21 @@ export default function Footer() {
       <div>
         Powered by{" "}
         <a
-          href="https://github.com/nfactorial-incubator"
-          target="_blank"
-          rel="noreferrer"
-          className="font-bold hover:underline transition underline-offset-2"
-        >
-          nFactorial{" "}
-        </a>
-        and{" "}
-        <a
           href="https://github.com/cyrkaade/"
           target="_blank"
           rel="noreferrer"
           className="font-bold hover:underline transition underline-offset-2"
         >
-          cyrkaade
+          cyrkaade{" "}
+        </a>
+        in{" "}
+        <a
+          href="https://github.com/nfactorial-incubator"
+          target="_blank"
+          rel="noreferrer"
+          className="font-bold hover:underline transition underline-offset-2"
+        >
+          nFactorial Incubator
         </a>
       </div>
       <div className="flex space-x-4 pb-4 sm:pb-0">

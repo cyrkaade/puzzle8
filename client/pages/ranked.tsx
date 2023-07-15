@@ -5,7 +5,7 @@ import { useRef, useState, useEffect } from "react";
 import { Toaster, toast } from "react-hot-toast";
 import DropDown, { PuzzleType } from "../components/DropDown";
 import Footer from "../components/Footer";
-import Header from "../components/Header";
+import Header from "../components/navbar/Header";
 import LoadingDots from "../components/LoadingDots";
 import {
   createParser,
@@ -79,17 +79,21 @@ interface PuzzleItemProps {
 
 const Ranked: NextPage = () => {
 
-    const [loading, setLoading] = useState(false);
+    const [loadingGenerate, setLoadingGenerate] = useState(false);
+    const [loadingSubmit, setLoadingSubmit] = useState(false);
     const [answer, setAnswer] = useState("");
     const [ptype, setType] = useState<PuzzleType>("Riddle");
-    const [difficulty, setDifficulty] = useState<number>(80);
+    let [difficulty, setDifficulty] = useState<string>("");
     const [generatedPuzzles, setGeneratedPuzzles] = useState<String>("");
     const [generatedAnswers, setGeneratedAnswers] = useState<String>("");
-  
+    const [isError, setIsError] = useState(false);
     const puzzleRef = useRef<null | HTMLDivElement>(null);
     const [currentUser, setCurrentUser] = useState(null);
-  
-    console.log(ptype)
+    const [isPuzzleGenerated, setIsPuzzleGenerated] = useState(false);
+    const [userPoints, setUserPoints] = useState(0);
+    const [userResult, setUserResult] = useState<string>("");
+    
+    
   
     useEffect(() => {
       fetch('/api/currentUser')
@@ -97,6 +101,7 @@ const Ranked: NextPage = () => {
         .then((data) => {
           if (data.user) {
             setCurrentUser(data.user);
+            setUserPoints(data.user.rating);
             Cookies.remove('generationCount');
           } else {
             console.error(data.error);
@@ -111,18 +116,32 @@ const Ranked: NextPage = () => {
       }
     };
     
-  
-    const prompt = `Generate 1 big logical puzzle or brainteaser with no hashtags. Make sure each generated puzzle is at least 150 characters, is unique, interesting and creative. Don't give the answer and solution.`;
+    if (userPoints < 700)
+      difficulty = "very easy";
+    else if (userPoints < 1100)
+        difficulty = "easy"
+    else if (userPoints < 1900)
+        difficulty = "medium"
+    else if (userPoints < 2300)
+        difficulty = "hard"
+    else if (userPoints >= 2300)
+        difficulty = "very hard"
+    const prompt = `As an artificial intelligence, I have been asked to create a unique puzzle specifically designed for a user and difficulty level of ${difficulty}. The puzzle can be a brainteaser, a logical problem, a detective scenario or any other form of mentally challenging task.
+
+    The key factors I must consider are that the puzzle should be innovative and uncommon, thereby providing a fresh challenge for the player. Considering the difficulty level, I need to ensure that the complexity of the puzzle is appropriate, neither too simple nor too complex, to maintain the user's interest and engagement.
+    
+    So, let's create this unique puzzle now. Word count should be 100-150 words. Please bear in mind that this puzzle is exclusively designed for a user and difficulty level of ${difficulty}. Here it is:`;
 
   
     const generatePuzzle = async (e: any) => {
+      setIsPuzzleGenerated(false);
       e.preventDefault();
       setGeneratedPuzzles("");
-      setLoading(true);
+      setLoadingGenerate(true);(true);
       if (!currentUser) {
         const generationCount = Cookies.get('generationCount') ? parseInt(Cookies.get('generationCount') as string) : 0;
         if (generationCount >= 2) {
-          setLoading(false);
+          setLoadingGenerate(true);(false);
           toast("I'm sorry, it seems like you've already used up all your generations. To get unlimited generations, please sign up.");
           return;
         }
@@ -136,7 +155,9 @@ const Ranked: NextPage = () => {
         body: JSON.stringify({
           prompt,
         }),
-      });
+      })
+      setIsPuzzleGenerated(true);;
+      
   
       if (!response.ok) {
         throw new Error(response.statusText);
@@ -171,27 +192,34 @@ const Ranked: NextPage = () => {
         parser.feed(chunkValue);
       }
       scrollToPuzzles();
-      setLoading(false);
+      setLoadingGenerate(false);
     };
 
 
-    const answer_prompt = `I have logical puzzle: ${generatedPuzzles}. The user gave the answer: ${setAnswer}. Please, check the user's answer and give me response: "Correct" or "Incorrect"`;
+    const answer_prompt = `I have logical puzzle: ${generatedPuzzles}. The user gave the answer: ${answer}. Please, check the user's answer and give me response: "Correct" or "Incorrect"`;
 
 
-    const generateAnswer = async (e: any) => {
+
+    const sendAnswer = async (e: any) => {
       e.preventDefault();
+      setGeneratedAnswers("");
+      if (answer.trim() === "") {
+        setIsError(true);
+        return;
+      }
+      setUserResult("");
       setGeneratedPuzzles("");
-      setLoading(true);
+      setLoadingSubmit(true);
       if (!currentUser) {
         const generationCount = Cookies.get('generationCount') ? parseInt(Cookies.get('generationCount') as string) : 0;
         if (generationCount >= 2) {
-          setLoading(false);
+          setLoadingSubmit(false);
           toast("I'm sorry, it seems like you've already used up all your generations. To get unlimited generations, please sign up.");
           return;
         }
         Cookies.set('generationCount', (generationCount + 1).toString());
       }
-      const response = await fetch("/api/generate", {
+      const response = await fetch("/api/checkAnswer", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -203,6 +231,7 @@ const Ranked: NextPage = () => {
       console.log(response)
   
       if (!response.ok) {
+        console.log(response)
         throw new Error(response.statusText);
       }
   
@@ -234,8 +263,13 @@ const Ranked: NextPage = () => {
         const chunkValue = decoder.decode(value);
         parser.feed(chunkValue);
       }
+      if (generatedAnswers.toLowerCase().includes('correct')) {
+        setUserResult('Correct');
+      } else {
+        setUserResult('Incorrect');
+      }
       scrollToPuzzles();
-      setLoading(false);
+      setLoadingSubmit(false);
     };
 
   
@@ -252,22 +286,27 @@ const Ranked: NextPage = () => {
         <LoginModal/>
         <Header currentUser={currentUser}/>
         <main className="flex flex-1 w-full flex-col items-center justify-center text-center px-4 mt-12 sm:mt-20">
+          <div className="flex justify-end items-center mr-4">
+            Rating: {userPoints}
+          </div>
+
           <h1 className="sm:text-6xl text-4xl max-w-[708px] font-bold text-slate-900">
             Ranked game
           </h1>
+
           <p className="text-slate-500 mt-5">Show everyone your deductive abilities!</p>
   
           <div className="max-w-xl w-full">
   
-            {!loading && (
-              <button
-                className="bg-black rounded-xl text-white font-medium px-4 py-2 sm:mt-10 mt-8 hover:bg-black/80 w-full"
-                onClick={(e) => generatePuzzle(e)}
-              >
-                Generate puzzle &rarr;
-              </button>
-            )}
-            {loading && (
+          {!loadingGenerate && !isPuzzleGenerated && (
+            <button
+              className="bg-black rounded-xl text-white font-medium px-4 py-2 sm:mt-10 mt-8 hover:bg-black/80 w-full"
+              onClick={(e) => generatePuzzle(e)}
+            >
+              Generate puzzle &rarr;
+            </button>
+          )}
+            {loadingGenerate && (
               <button
                 className="bg-black rounded-xl text-white font-medium px-4 py-2 sm:mt-10 mt-8 hover:bg-black/80 w-full"
                 disabled
@@ -307,22 +346,33 @@ const Ranked: NextPage = () => {
             </div>
             <textarea
               value={answer}
-              onChange={(e) => setAnswer(e.target.value)}
+              onChange={(e) => {
+                setAnswer(e.target.value);
+                setIsError(false);
+              }}
               rows={4}
               className="w-full rounded-md border-gray-300 shadow-sm focus:border-black focus:ring-black my-5"
               placeholder={
                 "e.g. Martin is a Killer."
               }
             />
-              {!loading && (
+              {!loadingSubmit && (
               <button
-                className="bg-black rounded-xl text-white font-medium px-4 py-2 sm:mt-10 mt-8 hover:bg-black/80 w-full"
-                onClick={(e) => generateAnswer(e)}
-              >
-                Generate answer &rarr;
-              </button>
+              className={`bg-black rounded-xl text-white font-medium px-4 py-2 sm:mt-10 mt-8 hover:bg-black/80 w-full ${!isPuzzleGenerated ? 'opacity-50 cursor-not-allowed' : ''}`}
+              onClick={(e) => sendAnswer(e)}
+              disabled={!isPuzzleGenerated}
+            >
+              Submit answer &rarr;
+            </button>
             )}
-            {loading && (
+
+            {isError && (
+              <div className="mt-2 text-red-500">
+                Please, enter the answer
+              </div>
+            )}
+
+            {loadingSubmit && (
               <button
                 className="bg-black rounded-xl text-white font-medium px-4 py-2 sm:mt-10 mt-8 hover:bg-black/80 w-full"
                 disabled
@@ -331,28 +381,30 @@ const Ranked: NextPage = () => {
               </button>
             )}
               <div className="space-y-10 my-10">
-                {generatedAnswers && (
-                  <>
-                    <div>
-                      <h2
-                        className="sm:text-4xl text-3xl font-bold text-slate-900 mx-auto"
-                        ref={puzzleRef}
-                      >
-                        Answer:
-                      </h2>
-                    </div>
-                    <div className="space-y-8 flex flex-col items-center justify-center max-w-xl mx-auto">
-                      
-                    {generatedPuzzles
-                    .split("^^^.")
-                    .map((generatedanswer, index) => (
-                      <PuzzleItem generatedpuzzle={generatedanswer} key={index} currentUser={currentUser} ptype="Competitive puzzle" />
-                    ))}
-                </div>
-              </>
-            )}
-            
-          </div>
+                  {generatedAnswers && (
+                      <>
+                          <div>
+                              <h2
+                                  className="sm:text-4xl text-3xl font-bold text-slate-900 mx-auto"
+                                  ref={puzzleRef}
+                              >
+                                  Answer:
+                              </h2>
+                          </div>
+                          <div className="space-y-8 flex flex-col items-center justify-center max-w-xl mx-auto">
+                              
+                              {generatedAnswers
+                              .split("^^^.")
+                              .map((generatedanswer, index) => (
+                                  <PuzzleItem generatedpuzzle={generatedanswer} key={index} currentUser={currentUser} ptype="Competitive puzzle" />
+                              ))}
+                          </div>
+                      </>
+                  )}
+              </div>
+              <div className={`mt-2 text-${userResult === 'Correct' ? 'green-500' : 'red-500'}`}>
+                {userResult === 'Correct' ? 'Well done! Your answer is correct :)' : userResult === 'Incorrect' ? 'Incorrect answer, try one more time' : ''}
+              </div>
           </div>
           <Toaster
             position="top-center"

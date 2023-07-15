@@ -6,7 +6,7 @@ import { Toaster, toast } from "react-hot-toast";
 import DropDown, { PuzzleType } from "../components/DropDown";
 import Footer from "../components/Footer";
 import Github from "../components/GitHub";
-import Header from "../components/Header";
+import Header from "../components/navbar/Header";
 import LoadingDots from "../components/LoadingDots";
 import DiscreteSliderLabel from "../components/Slider";
 import {
@@ -88,8 +88,6 @@ const Home: NextPage = () => {
 
   const puzzleRef = useRef<null | HTMLDivElement>(null);
   const [currentUser, setCurrentUser] = useState(null);
-
-  console.log(ptype)
 
   useEffect(() => {
     fetch('/api/currentUser')
