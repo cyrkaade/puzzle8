@@ -19,3 +19,5 @@ database = client['puzzle']
 
 # Create a reference to the collection
 favorites_collection = database['favorites']
+
+users_collection = database['User']

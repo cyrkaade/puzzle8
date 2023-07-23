@@ -1,11 +1,30 @@
 from fastapi import APIRouter, HTTPException
+import spacy
+import requests
 import model
 import config
 from bson import ObjectId
+from random import randint
+from pydantic import BaseModel
+import os
+import openai
+
+
+class RatingUpdate(BaseModel):
+    user_id: str
+    result: str
 
 def convert_mongo_doc(document):
     document["_id"] = str(document["_id"])
     return document
+
+nlp = spacy.load('en_core_web_sm')
+
+def extract_keywords(text: str):
+    doc = nlp(text)
+    keywords = [chunk.text for chunk in doc.noun_chunks]
+    return ', '.join(keywords)
+
 
 router = APIRouter()
 
@@ -39,4 +58,22 @@ def remove_favorite(favorite_id: str):
         return {"message": "Favorite removed successfully"}
     else:
         raise HTTPException(status_code=400, detail="Failed to remove favorite")
+    
+
+# @router.post("/generateImage")
+# def generate_image(body: model.ImageRequest):
+#     openai.api_key = os.getenv('OPENAI_API_KEY')
+#     prompt = extract_keywords(body.prompt)
+    
+
+#     res = openai.Image.create(
+#     prompt=prompt,
+#     n=1,
+#     size="512x512",
+#   )
+#   # returning the URL of one image as 
+#   # we are generating only one image
+#     image_url = res["data"][0]["url"]
+    
+#     return {"image_url": image_url}
 
