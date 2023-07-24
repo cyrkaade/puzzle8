@@ -11,7 +11,7 @@ import openai
 import yake
 import random
 
-positive_prompts = ["8k", "highest quality", "masterpiece", "ultra-high resolution", "best shadow", "best illustration", "Highly creative", "Deeply immersive"]
+positive_prompts = ["8k", "highest quality", "masterpiece", "ultra-high resolution", "best illustration", "Highly creative"]
 
 
 def extract_keywords(text: str, max_n_keywords=6):
@@ -75,7 +75,7 @@ def remove_favorite(favorite_id: str):
 def generate_image(body: model.ImageRequest):
     openai.api_key = os.getenv('OPENAI_API_KEY')
     prompt = extract_keywords(body.prompt)
-    prompt += ', ' + ', '.join(random.sample(positive_prompts, 7))
+    prompt += ', ' + ', '.join(random.sample(positive_prompts, 6))
     print(prompt)
     
 
@@ -84,9 +84,19 @@ def generate_image(body: model.ImageRequest):
     n=1,
     size="512x512",
   )
-  # returning the URL of one image as 
-  # we are generating only one image
     image_url = res["data"][0]["url"]
     
     return {"image_url": image_url}
+
+
+@router.get("/users/ranking/{user_id}")
+def get_user_ranking(user_id: str):
+    users = config.users_collection.find().sort("rating", -1)
+    users_list = [convert_mongo_doc(user) for user in users]
+    user_ranks = {user['_id']: idx+1 for idx, user in enumerate(users_list)}
+    if user_id in user_ranks:
+        return {"rank": user_ranks[user_id]}
+    else:
+        raise HTTPException(status_code=404, detail="User not found")
+
 

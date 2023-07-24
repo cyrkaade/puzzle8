@@ -4,6 +4,7 @@ import { useCallback, useState } from "react";
 import { AiOutlineMenu } from "react-icons/ai";
 import { signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { useMediaQuery } from 'react-responsive';
 
 import useLoginModal from "../../hooks//useLoginModal";
 import useRegisterModal from "../../hooks/useRegisterModal";
@@ -11,6 +12,7 @@ import useRegisterModal from "../../hooks/useRegisterModal";
 import MenuItem from "./MenuItem";
 import { User } from "@prisma/client";
 import Avatar from "../Avatar";
+import { useTranslation } from 'next-i18next';
 
 interface UserMenuProps {
     currentUser?: User | null
@@ -29,6 +31,9 @@ interface UserMenuProps {
   const toggleOpen = useCallback(() => {
     setIsOpen((value) => !value);
   }, []);
+  const isDesktopOrLaptop = useMediaQuery({ query: '(min-width: 768px)' });
+
+  const { t } = useTranslation('common');
 
   return ( 
     <div className="relative">
@@ -76,35 +81,39 @@ interface UserMenuProps {
           <div className="flex flex-col cursor-pointer">
             {currentUser ? (
               <>
-              <MenuItem
-              label="Explore"
-              onClick={() => router.push('/explore')}
-            />
-            <hr />
-            <MenuItem
-              label="Ranked"
-              onClick={() => router.push('/ranked')}
-            />
-            <hr />
-
+                {!isDesktopOrLaptop && 
+                  <>
+                    <MenuItem
+                    label={t('explore')}
+                    onClick={() => router.push('/explore')}
+                  />
+                  <hr />
+                  <MenuItem
+                    label={t('ranked')}
+                    onClick={() => router.push('/ranked')}
+                  />
+                  <hr />
+                  </>
+                }
+                
                 <MenuItem 
-                  label="My favorites" 
+                  label={t('favorites')} 
                   onClick={() => router.push('/favorites')}
                 />
                 <hr />
                 <MenuItem 
-                  label="Logout" 
+                  label={t('logout')} 
                   onClick={() => signOut()}
                 />
               </>
             ) : (
               <>
                 <MenuItem 
-                  label="Login" 
+                  label={t('login_title')} 
                   onClick={loginModal.onOpen}
                 />
                 <MenuItem 
-                  label="Sign up" 
+                  label={t('signup')}  
                   onClick={registerModal.onOpen}
                 />
               </>

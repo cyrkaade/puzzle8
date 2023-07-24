@@ -11,6 +11,7 @@ import {
 import { FcGoogle } from "react-icons/fc";
 import { AiFillGithub } from "react-icons/ai";
 import { useRouter } from "next/navigation";
+import { useTranslation } from 'next-i18next';
 
 import useRegisterModal from "../hooks/useRegisterModal";
 import useLoginModal from "../hooks/useLoginModal";
@@ -25,6 +26,7 @@ const LoginModal = () => {
   const loginModal = useLoginModal();
   const registerModal = useRegisterModal();
   const [isLoading, setIsLoading] = useState(false);
+  const { t } = useTranslation('common');
 
   const { 
     register, 
@@ -51,7 +53,7 @@ const LoginModal = () => {
       setIsLoading(false);
 
       if (callback?.ok) {
-        toast.success('Logged in');
+        toast.success(`${t('logged')}`);
         router.refresh();
         loginModal.onClose();
       }
@@ -70,8 +72,8 @@ const LoginModal = () => {
   const bodyContent = (
     <div className="flex flex-col gap-4">
       <Heading
-        title="Welcome back"
-        subtitle="Login to your account!"
+        title={t('welcome_back')}
+        subtitle={t('logindirect')}
       />
       <Input
         id="email"
@@ -83,7 +85,7 @@ const LoginModal = () => {
       />
       <Input
         id="password"
-        label="Password"
+        label={t('password')}
         type="password"
         disabled={isLoading}
         register={register}
@@ -98,19 +100,19 @@ const LoginModal = () => {
       <hr />
       <Button 
         outline 
-        label="Continue with Google"
+        label={t('google_continue')}
         icon={FcGoogle}
         onClick={() => signIn('google')}
       />
       <Button 
         outline 
-        label="Continue with Github"
+        label={t('github_continue')}
         icon={AiFillGithub}
         onClick={() => signIn('github')}
       />
       <div className="
       text-neutral-500 text-center mt-4 font-light">
-        <p>First time using Airbnb?
+        <p>{t('first_time')}
           <span 
             onClick={onToggle} 
             className="
@@ -118,7 +120,7 @@ const LoginModal = () => {
               cursor-pointer 
               hover:underline
             "
-            > Create an account</span>
+            > {t('create_account')}</span>
         </p>
       </div>
     </div>
@@ -128,8 +130,8 @@ const LoginModal = () => {
     <Modal
       disabled={isLoading}
       isOpen={loginModal.isOpen}
-      title="Login"
-      actionLabel="Continue"
+      title={t('login_title')}
+      actionLabel={t('continue')}
       onClose={loginModal.onClose}
       onSubmit={handleSubmit(onSubmit)}
       body={bodyContent}

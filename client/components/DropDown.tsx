@@ -5,21 +5,24 @@ import {
   ChevronUpIcon,
 } from "@heroicons/react/20/solid";
 import { Fragment } from "react";
+import { useTranslation } from 'next-i18next';
+
 
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
 }
 
-export type PuzzleType = "Riddle" | "Brainteaser" | "Logic Puzzle";
+export type PuzzleType = "Riddle" | "Brainteaser" | "logic_puzzle";
 
 interface DropDownProps {
   ptype: PuzzleType;
   setType: (ptype: PuzzleType) => void;
 }
 
-let ptypes: PuzzleType[] = ["Riddle", "Brainteaser", "Logic Puzzle"];
+let ptypes: PuzzleType[] = ["Riddle", "Brainteaser", "logic_puzzle"];
 
 export default function DropDown({ ptype, setType }: DropDownProps) {
+  const { t } = useTranslation('common');
   return (
     <Menu as="div" className="relative block text-left w-full">
       <div>
@@ -54,18 +57,18 @@ export default function DropDown({ ptype, setType }: DropDownProps) {
               <Menu.Item key={ptypeItem}>
                 {({ active }) => (
                   <button
-                    onClick={() => setType(ptypeItem)}
-                    className={classNames(
-                      active ? "bg-gray-100 text-gray-900" : "text-gray-700",
-                      ptype === ptypeItem ? "bg-gray-200" : "",
-                      "px-4 py-2 text-sm w-full text-left flex items-center space-x-2 justify-between"
-                    )}
-                  >
-                    <span>{ptypeItem}</span>
-                    {ptype === ptypeItem ? (
-                      <CheckIcon className="w-4 h-4 text-bold" />
-                    ) : null}
-                  </button>
+                  onClick={() => setType(ptypeItem)}
+                  className={classNames(
+                    active ? "bg-gray-100 text-gray-900" : "text-gray-700",
+                    ptype === ptypeItem ? "bg-gray-200" : "",
+                    "px-4 py-2 text-sm w-full text-left flex items-center space-x-2 justify-between"
+                  )}
+                >
+                  <span>{t(ptypeItem)}</span>
+                  {ptype === ptypeItem ? (
+                    <CheckIcon className="w-4 h-4 text-bold" />
+                  ) : null}
+                </button>
                 )}
               </Menu.Item>
             ))}

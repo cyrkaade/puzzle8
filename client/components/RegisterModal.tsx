@@ -14,6 +14,7 @@ import {
 
 import useLoginModal from "../hooks/useLoginModal";
 import useRegisterModal from "../hooks/useRegisterModal";
+import { useTranslation } from 'next-i18next';
 
 import Modal from "./Modal";
 import Input from "./Input";
@@ -24,6 +25,8 @@ const RegisterModal= () => {
   const registerModal = useRegisterModal();
   const loginModal = useLoginModal();
   const [isLoading, setIsLoading] = useState(false);
+  const { t } = useTranslation('common');
+  
 
   const { 
     register, 
@@ -44,7 +47,7 @@ const RegisterModal= () => {
 
     axios.post('/api/register', data)
     .then(() => {
-      toast.success('Registered!');
+      toast.success(`${t('registered')}`);
       registerModal.onClose();
       loginModal.onOpen();
     })
@@ -64,8 +67,8 @@ const RegisterModal= () => {
   const bodyContent = (
     <div className="flex flex-col gap-4">
       <Heading
-        title="Welcome to Puzzle8"
-        subtitle="Create an account!"
+        title={t('welcome')}
+        subtitle={t('create_account')}
       />
       <Input
         id="email"
@@ -77,7 +80,7 @@ const RegisterModal= () => {
       />
       <Input
         id="name"
-        label="Name"
+        label={t('name')}
         disabled={isLoading}
         register={register}
         errors={errors}
@@ -85,7 +88,7 @@ const RegisterModal= () => {
       />
       <Input
         id="password"
-        label="Password"
+        label={t('password')}
         type="password"
         disabled={isLoading}
         register={register}
@@ -100,13 +103,13 @@ const RegisterModal= () => {
       <hr />
       <Button 
         outline 
-        label="Continue with Google"
+        label={t('google_continue')}
         icon={FcGoogle}
         onClick={() => signIn('google')} 
       />
       <Button 
         outline 
-        label="Continue with Github"
+        label={t('github_continue')}
         icon={AiFillGithub}
         onClick={() => signIn('github')}
       />
@@ -118,7 +121,7 @@ const RegisterModal= () => {
           font-light
         "
       >
-        <p>Already have an account?
+        <p>{t('already')}
           <span 
             onClick={onToggle} 
             className="
@@ -126,7 +129,7 @@ const RegisterModal= () => {
               cursor-pointer 
               hover:underline
             "
-            > Log in</span>
+            > {t('log_in')}</span>
         </p>
       </div>
     </div>
@@ -136,8 +139,8 @@ const RegisterModal= () => {
     <Modal
       disabled={isLoading}
       isOpen={registerModal.isOpen}
-      title="Register"
-      actionLabel="Continue"
+      title={t('register_title')}
+      actionLabel={t('continue')}
       onClose={registerModal.onClose}
       onSubmit={handleSubmit(onSubmit)}
       body={bodyContent}

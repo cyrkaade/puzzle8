@@ -1,4 +1,4 @@
-import type { NextPage, GetServerSideProps } from "next";
+import type { NextPage, GetServerSideProps, GetStaticProps } from "next";
 import Head from "next/head";
 import Image from "next/image";
 import { useRef, useState, useEffect } from "react";
@@ -18,6 +18,9 @@ import RegisterModal from "../components/RegisterModal";
 import LoginModal from "../components/LoginModal";
 import { FaRegHeart, FaHeart } from 'react-icons/fa';
 import Cookies from 'js-cookie';
+import { useTranslation } from 'next-i18next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import { Textarea } from "../@/components/ui/textarea";
 
 
 interface PuzzleItemProps {
@@ -28,13 +31,14 @@ interface PuzzleItemProps {
 
 const PuzzleItem: React.FC<PuzzleItemProps> = ({ generatedpuzzle, currentUser, ptype }) => {
   const [isFavorited, setFavorited] = useState(false);
+  const { t } = useTranslation('common');
   const API_URL = 'http://localhost:8000';
   return (
     <div
       className="bg-white rounded-xl shadow-md p-4 hover:bg-gray-100 transition cursor-copy border flex items-center"
       onClick={() => {
         navigator.clipboard.writeText(generatedpuzzle);
-        toast("puzzle copied to clipboard", { icon: "✂️" });
+        toast(`${t('copy')}`, { icon: "✂️" });
       }}
     >
       {currentUser && (
@@ -78,7 +82,7 @@ const PuzzleItem: React.FC<PuzzleItemProps> = ({ generatedpuzzle, currentUser, p
   );
 };
 
-const Home: NextPage = () => {
+const Home: NextPage<{locale: string}> = ({locale}) => { 
 
   const [loading, setLoading] = useState(false);
   const [style, setStyle] = useState("");
@@ -88,6 +92,8 @@ const Home: NextPage = () => {
 
   const puzzleRef = useRef<null | HTMLDivElement>(null);
   const [currentUser, setCurrentUser] = useState(null);
+  const { t,i18n } = useTranslation('common');
+
 
   useEffect(() => {
     fetch('/api/currentUser')
@@ -102,6 +108,12 @@ const Home: NextPage = () => {
       });
   }, []);
 
+  useEffect(() => {
+    if (i18n.isInitialized) { // or i18n.language === locale
+      setType(t('Riddle') as PuzzleType); // Translate here
+    }
+  }, [i18n.isInitialized, t]);
+
   
   const scrollToPuzzles = () => {
     if (puzzleRef.current !== null) {
@@ -109,10 +121,19 @@ const Home: NextPage = () => {
     }
   };
 
-  const prompt = `Generate 2 ${ptype}s with no hashtags and clearly labeled "1." and "2.".
-      Make sure each generated puzzle is less than 200 characters, is unique, interesting and creative. The puzzle style (vibe) should be like: ${style}${
-    style.slice(-1) === "." ? "" : "."
-  } Difficulty: ${difficulty}. Don't give the answer and solution.`;
+  let prompt: string
+  if (locale === 'ru'){ 
+  prompt = `Сгенерируйте 2 ${ptype} без хэштегов и с четкими надписями "1." и "2.".
+  Убедитесь, что каждая сгенерированная головоломка содержит менее 200 символов, уникальна, интересна и креативна. Стиль головоломки (атмосфера) должен быть таким: ${style}${
+  style.slice(-1) === "." ? "" : "."
+} Сложность: ${difficulty}. Не давайте ответа и решения.`;
+}
+else {
+  prompt = `Generate 2 ${ptype}s with no hashtags and clearly labeled "1." and "2.".
+  Make sure each generated puzzle is less than 200 characters, is unique, interesting and creative. The puzzle style (vibe) should be like: ${style}${
+style.slice(-1) === "." ? "" : "."
+} Difficulty: ${difficulty}. Don't give the answer and solution.`;
+}
 
   const generatePuzzle = async (e: any) => {
     e.preventDefault();
@@ -122,7 +143,7 @@ const Home: NextPage = () => {
       const generationCount = Cookies.get('generationCount') ? parseInt(Cookies.get('generationCount') as string) : 0;
       if (generationCount >= 2) {
         setLoading(false);
-        toast("I'm sorry, it seems like you've already used up all your generations. To get unlimited generations, please sign up.");
+        toast(`${t('limit')}`);
         return;
       }
       Cookies.set('generationCount', (generationCount + 1).toString());
@@ -195,7 +216,7 @@ const Home: NextPage = () => {
           <p>Star on GitHub</p>
         </a>
         <h1 className="sm:text-6xl text-4xl max-w-[708px] font-bold text-slate-900">
-          Generate your favourite puzzles
+        {t('home_title')}
         </h1>
         <p className="text-slate-500 mt-5">52 users overall</p>
 
@@ -209,26 +230,24 @@ const Home: NextPage = () => {
               className="mb-5 sm:mb-0"
             />
             <p className="text-left font-medium">
-              Write puzzle style (vibe){" "}
+            {t('style')}
               <span className="text-slate-500">
-                (or write a few sentences about puzzle)
+                {t('graystyle')}
               </span>
               .
             </p>
           </div>
-          <textarea
-            value={style}
+          <Textarea value={style}
             onChange={(e) => setStyle(e.target.value)}
             rows={4}
             className="w-full rounded-md border-gray-300 shadow-sm focus:border-black focus:ring-black my-5"
             placeholder={
-              "e.g. Cyberpunk style, 18th century style"
-            }
-          />
+              `${t('egstyle')}`
+            }/>
 
           <div className="flex mb-5 items-center space-x-3">
             <Image src="/2-black.png" width={30} height={30} alt="1 icon" />
-            <p className="text-left font-medium">Select puzzle type.</p>
+            <p className="text-left font-medium">{t('type')}</p>
           </div>
           <div className="block">
             <DropDown ptype={ptype} setType={(newType) => setType(newType)} />
@@ -236,7 +255,7 @@ const Home: NextPage = () => {
 
           <div className="flex items-center space-x-3 mt-5">
             <Image src="/number-three.png" width={30} height={30} alt="1 icon" />
-            <p className="text-left font-medium">Select puzzle difficulty.</p>
+            <p className="text-left font-medium">{t('difficulty')}</p>
           </div>
           <DiscreteSliderLabel onChange={setDifficulty} />
 
@@ -245,7 +264,7 @@ const Home: NextPage = () => {
               className="bg-black rounded-xl text-white font-medium px-4 py-2 sm:mt-10 mt-8 hover:bg-black/80 w-full"
               onClick={(e) => generatePuzzle(e)}
             >
-              Generate puzzle &rarr;
+              {t('generate_puzzle')} &rarr;
             </button>
           )}
           {loading && (
@@ -271,7 +290,7 @@ const Home: NextPage = () => {
                   className="sm:text-4xl text-3xl font-bold text-slate-900 mx-auto"
                   ref={puzzleRef}
                 >
-                  Your generated puzzles
+                  {t('generated_puzzles')}
                 </h2>
               </div>
               <div className="space-y-8 flex flex-col items-center justify-center max-w-xl mx-auto">
@@ -291,5 +310,12 @@ const Home: NextPage = () => {
     </div>
   );
 };
+
+export const getStaticProps: GetStaticProps = async ({ locale }) => ({
+  props: {
+    ...await serverSideTranslations(locale as string, ['common']),
+    locale,
+  },
+});
 
 export default Home;

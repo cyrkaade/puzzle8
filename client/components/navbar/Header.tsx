@@ -5,6 +5,7 @@ import { signOut } from "next-auth/react";
 import { FaHeart } from 'react-icons/fa';
 import UserMenu from "./UserMenu";
 import { useMediaQuery } from 'react-responsive';
+import { useTranslation } from 'next-i18next';
 
 interface HeaderProps {
   currentUser?: User | null
@@ -18,6 +19,8 @@ const Header: React.FC<HeaderProps> = ({
   const isDesktopOrLaptop = useMediaQuery({
     query: '(min-width: 768px)'
   });
+  const { t } = useTranslation('common');
+
   return (
     <header className="flex justify-between items-center w-full mt-5 border-b-2 pb-4 sm:px-4 px-2">
       <Link href="/" className="flex space-x-3 -ml-2">
@@ -33,9 +36,9 @@ const Header: React.FC<HeaderProps> = ({
         </h1>
       </Link>
   
-      <div className="md:flex hidden mr-10 space-x-4">
-        <Link href="/explore" className="hover:underline">Explore</Link>
-        <Link href="/ranked" className="hover:underline">Ranked</Link>
+      <div className="md:flex hidden mr-12 space-x-6">
+        <Link href="/explore" className="hover:underline">{t('explore')}</Link>
+        <Link href="/ranked" className="hover:underline">{t('ranked')}</Link>
       </div>
   
       <div className="flex items-center mr-2">

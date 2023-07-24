@@ -1,39 +1,42 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
 import Slider from '@mui/material/Slider';
-
-const marks = [
-  {
-    value: 0,
-    label: 'Very easy',
-  },
-  {
-    value: 20,
-    label: 'Easy'
-  },
-  {
-    value: 50,
-    label: 'Medium',
-  },
-  {
-    value: 80,
-    label: 'Hard',
-  },
-  {
-    value: 100,
-    label: 'Extremely hard',
-  },
-];
-
-function valuetext(value: number) {
-  return `${value}`;
-}
+import { useTranslation } from 'next-i18next';
 
 interface DiscreteSliderLabelProps {
   onChange: (value: number) => void;
 }
 
 export default function DiscreteSliderLabel({ onChange }: DiscreteSliderLabelProps) {
+  const { t } = useTranslation('common');
+
+  const marks = [
+    {
+      value: 0,
+      label: t('very_easy'),
+    },
+    {
+      value: 20,
+      label: t('easy')
+    },
+    {
+      value: 50,
+      label: t('medium'),
+    },
+    {
+      value: 80,
+      label: t('hard'),
+    },
+    {
+      value: 100,
+      label: t('extremely_hard'),
+    },
+  ];
+
+  function valuetext(value: number) {
+    return `${value}`;
+  }
+
   return (
     <Box
       sx={{
