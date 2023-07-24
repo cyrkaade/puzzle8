@@ -101,6 +101,14 @@ const Ranked: NextPage = () => {
     const [gameOver, setGameOver] = useState(false);
     const [ratingMessage, setRatingMessage] = useState<string | null>(null);
     const [imageURL, setImageURL] = useState('');
+
+    useEffect(() => {
+      // this useEffect will run whenever generatedPuzzles changes
+      if(isPuzzleGenerated) {
+        console.log(generatedPuzzles)
+        generateImage(generatedPuzzles);
+      }
+    }, [isPuzzleGenerated]);
     
      
     const handleShowAnswer = async () => {
@@ -263,6 +271,7 @@ const Ranked: NextPage = () => {
       setGeneratedAnswers("");
       e.preventDefault();
       setGeneratedPuzzles("");
+      setImageURL("")
       setLoadingGenerate(true);
       if (!currentUser) {
         const generationCount = Cookies.get('generationCount') ? parseInt(Cookies.get('generationCount') as string) : 0;
@@ -282,7 +291,6 @@ const Ranked: NextPage = () => {
           prompt,
         }),
       })
-      setIsPuzzleGenerated(true);;
       setTimer(300);
       setDisableButton(false);
       setTimerMessage("");
@@ -323,31 +331,29 @@ const Ranked: NextPage = () => {
         const chunkValue = decoder.decode(value);
         parser.feed(chunkValue);
       }
+      setIsPuzzleGenerated(true);;
       scrollToPuzzles();
       setLoadingGenerate(false);
-      // generateImage();
     };
 
+    const generateImage = async (generatedPuzzles: string) => {
+      const imageRes = await fetch(`${API_URL}/generateImage`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          prompt: generatedPuzzles,  // send the generated puzzle as a prompt
+        }),
+      })
+      
+      // If successful, set the image URL to your state variable
+      if (imageRes.ok) {
+        const imageData = await imageRes.json();
+        setImageURL(imageData.image_url);
+      }
+    };
 
-
-  //   const generateImage = async () => {
-  //   const response = await fetch('/api/generateImage', {
-  //     method: 'POST',
-  //     headers: {
-  //       'Content-Type': 'application/json',
-  //     },
-  //     body: JSON.stringify({
-  //       prompt: generatedPuzzles
-  //     })
-  //   });
-
-  //   if (!response.ok) {
-  //     throw new Error(response.statusText);
-  //   }
-
-  //   const data = await response.json();
-  //   setImageURL(data.image_url);
-  // }
 
     const answer_prompt = `I have logical puzzle: ${generatedPuzzles}. The user gave the answer: ${answer}. Please, check the user's answer and give me response only 1 word without spaces and other words and dots and other symbols, WITHOUT DOTS just word: "Correct" or "Incorrect"`;
     
