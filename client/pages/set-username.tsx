@@ -16,6 +16,7 @@ import { Button } from '../@/components/ui/button';
 import { useTranslation } from 'react-i18next';
 import { GetStaticProps } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import Head from 'next/head';
 
 
 export default function SetUsername() {
@@ -68,6 +69,10 @@ export default function SetUsername() {
 
   return (
     <div className="flex justify-center items-center min-h-screen px-4 sm:px-6 lg:px-8">
+      <Head>
+      <title>sherlck.</title>
+          <link rel="icon" href="/reallogo.ico" />
+      </Head>
       {session && 
         <Card className="w-full sm:w-96">
           <CardHeader>

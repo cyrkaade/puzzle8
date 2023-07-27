@@ -27,8 +27,8 @@ const Explore: NextPage = () => {
 return (
     <div className="flex max-w-5xl mx-auto flex-col items-center justify-center py-2 min-h-screen">
       <Head>
-        <title>Puzzle8</title>
-        <link rel="icon" href="/favicon.ico" />
+          <title>sherlck.</title>
+          <link rel="icon" href="/reallogo.ico" />
       </Head>
       <RegisterModal/>
       <LoginModal/>
@@ -46,6 +46,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     const { locale } = context;
   
     return {
+      
       props: {
         ...(await serverSideTranslations(locale as string, ['common'])),
         // otherPropsYouMightNeed...

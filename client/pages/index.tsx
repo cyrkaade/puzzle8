@@ -204,8 +204,8 @@ style.slice(-1) === "." ? "" : "."
       
       
       <Head>
-        <title>Puzzle8</title>
-        <link rel="icon" href="/favicon.ico" />
+        <title>sherlck.</title>
+        <link rel="icon" href="/reallogo.ico" />
       </Head>
       <RegisterModal/>
       <LoginModal/>

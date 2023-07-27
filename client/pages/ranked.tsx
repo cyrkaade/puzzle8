@@ -541,7 +541,7 @@ const Ranked: NextPage<{locale: string}> = ({locale}) => {
       <div className="flex max-w-5xl mx-auto flex-col items-center justify-center py-2 min-h-screen">
         <Head>
           <title>sherlck.</title>
-          <link rel="icon" href="/favicon.ico" />
+          <link rel="icon" href="/reallogo.ico" />
         </Head>
         <RegisterModal/>
         <LoginModal/>

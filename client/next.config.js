@@ -13,7 +13,7 @@ module.exports = {
     return [
       {
         source: "/github",
-        destination: "https://github.com/cyrakade/puzzle8",
+        destination: "https://github.com/cyrakade/sherlck",
         permanent: false,
       },
     ];

@@ -137,6 +137,7 @@ const API_URL = 'http://localhost:8000';
 
 import { withClientSideRendering } from "../actions/withClientSideRendering"
 import withUsername from "../actions/withUsername"
+import Head from "next/head"
 // import withUsername from "../actions/withUsername"
  
 // export const columns: ColumnDef<Favorite>[] = [
@@ -405,6 +406,10 @@ const deleteFavorites = async () => {
  
   return (
     <div>
+      <Head>
+            <title>sherlck.</title>
+          <link rel="icon" href="/reallogo.ico" />
+      </Head>
       {/* @ts-ignore */}
       <Header currentUser={currentUser}/>
     <div className="w-full">
