@@ -199,7 +199,7 @@ style.slice(-1) === "." ? "" : "."
 
 
   return (
-    <div className="flex max-w-5xl mx-auto flex-col items-center justify-center py-2 min-h-screen">
+    <div className="flex max-w-5xl mx-auto flex-col items-center justify-center py-2 min-h-screen z-10">
 
       
       
@@ -211,9 +211,14 @@ style.slice(-1) === "." ? "" : "."
       <LoginModal/>
       <Header currentUser={currentUser}/>
       <main className="flex flex-1 w-full flex-col items-center justify-center text-center px-4 mt-12 sm:mt-20">
+      {/* <img className="hidden lg:block absolute right-20 top-60 sm:w-24 md:w-24 lg:w- z-0" src="/9.png" alt="Upside Down Triangle" /> 
+    <img className="hidden lg:block absolute left-10 bottom-30 sm:w-28 md:w-28 lg:w-32 z-0" src="/10.png" alt="Heart" /> 
+    <img className="hidden lg:block absolute right-10 bottom-[-200px] sm:w-28 md:w-32 lg:w-48 z-0" src="/12.png" alt="Square" /> */}
+
+
         <a
           className="flex max-w-fit items-center justify-center space-x-2 rounded-full border border-gray-300 bg-white px-4 py-2 text-sm text-gray-600 shadow-md transition-colors hover:bg-gray-100 mb-5"
-          href="https://github.com/cyrkaade/puzzle8"
+          href="https://github.com/cyrkaade/sherlck"
           target="_blank"
           rel="noopener noreferrer"
         >
