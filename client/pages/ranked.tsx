@@ -20,6 +20,9 @@ import axios from 'axios';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { Textarea } from "../@/components/ui/textarea";
+import withUsername from "../actions/withUsername";
+import { getSession } from "../actions/getCurrentUser";
+// import withUsername from "../actions/withUsername";
 
 
 const API_URL = 'http://localhost:8000';
@@ -42,7 +45,7 @@ interface PuzzleItemProps {
       >
         {currentUser && (
         <div
-          className={`w-6 h-6 mr-4 text-purple-700 cursor-pointer transition duration-500 ease-in-out transform items-center ${isFavorited ? "scale-125" : ""}`}
+          className={`w-6 h-6 mr-4 text-amber-600 cursor-pointer transition duration-500 ease-in-out transform items-center ${isFavorited ? "scale-125" : ""}`}
           onClick={(e) => {
             e.stopPropagation();
             setFavorited(!isFavorited);
@@ -105,6 +108,12 @@ const Ranked: NextPage<{locale: string}> = ({locale}) => {
     const [ratingMessage, setRatingMessage] = useState<string | null>(null);
     const [userRank, setUserRank] = useState(0);
     const [imageURL, setImageURL] = useState('');
+    const [isLastAnswerCorrect, setIsLastAnswerCorrect] = useState<boolean>(false);
+    const [correctAnswer, setCorrectAnswer] = useState<String>("");
+
+    
+    
+
 
     const { t } = useTranslation('common');
 
@@ -119,6 +128,7 @@ const Ranked: NextPage<{locale: string}> = ({locale}) => {
       setShowAnswer(true);
       generateAnswer();
       
+      if (!isLastAnswerCorrect) {
       await fetch("/api/rateDown", {
         method: "POST",
         headers: {
@@ -128,6 +138,7 @@ const Ranked: NextPage<{locale: string}> = ({locale}) => {
           userId: currentUser.id,
         }),
       });
+    }
     
       setTimer(0);
       setDisableButton(true);
@@ -271,14 +282,14 @@ const Ranked: NextPage<{locale: string}> = ({locale}) => {
 
     Ключевые факторы, которые я должен учитывать, заключаются в том, что головоломка должна быть инновационной и необычной, тем самым предоставляя игроку новый вызов. Учитывая уровень сложности, мне нужно убедиться, что сложность головоломки соответствующая, не слишком простая и не слишком усложненная, чтобы поддерживать интерес и вовлеченность пользователя.
     
-    Итак, давайте сейчас создадим эту уникальную головоломку. Количество слов должно составлять максимум 90 слов. Пожалуйста, имейте в виду, что эта головоломка предназначена исключительно для пользователя и имеет уровень сложности ${difficulty}. Сгенерируй только текст пазла сразу же.`;
+    Итак, давайте сейчас создадим эту уникальную головоломку. Количество слов должно составлять максимум 90 слов. Пожалуйста, имейте в виду, что эта головоломка предназначена исключительно для пользователя и имеет уровень сложности ${difficulty}. Сгенерируй только текст пазла сразу же без ответов и только один пазл. Лимит: Максимум 90 слов.`;
   }
   else {
     prompt = `As an artificial intelligence, I have been asked to create a unique puzzle specifically designed for a user and difficulty level of ${difficulty}. The puzzle can be a brainteaser, a logical problem, a detective scenario or any other form of mentally challenging task.
 
     The key factors I must consider are that the puzzle should be innovative and uncommon, thereby providing a fresh challenge for the player. Considering the difficulty level, I need to ensure that the complexity of the puzzle is appropriate, neither too simple nor too complex, to maintain the user's interest and engagement.
     
-    So, let's create this unique puzzle now. Word count should be maximum 90 words. Please bear in mind that this puzzle is exclusively designed for a user and difficulty level of ${difficulty}. Generate only puzzle text.`;
+    So, let's create this unique puzzle now. Word count should be maximum 90 words. Please bear in mind that this puzzle is exclusively designed for a user and difficulty level of ${difficulty}. Generate only puzzle text. Maximum word limit: 90 words.`;
   }
   
     const generatePuzzle = async (e: any) => {
@@ -289,6 +300,7 @@ const Ranked: NextPage<{locale: string}> = ({locale}) => {
       e.preventDefault();
       setGeneratedPuzzles("");
       setImageURL("")
+      setIsLastAnswerCorrect(false);
       setLoadingGenerate(true);
       if (!currentUser) {
         const generationCount = Cookies.get('generationCount') ? parseInt(Cookies.get('generationCount') as string) : 0;
@@ -447,6 +459,7 @@ const Ranked: NextPage<{locale: string}> = ({locale}) => {
         setDisableButton(true);
         setTimer(0);
         setTimerMessage(null);
+        setIsLastAnswerCorrect(true); 
       
         await fetch("/api/rateUp", {
           method: "POST",
@@ -462,6 +475,7 @@ const Ranked: NextPage<{locale: string}> = ({locale}) => {
         updateUserData();
       } else {
         setAnswerMessage('Incorrect answer, try one more time');
+        setIsLastAnswerCorrect(false);
       }
       
 
@@ -472,50 +486,56 @@ const Ranked: NextPage<{locale: string}> = ({locale}) => {
     };
 
     const generateAnswer = async () => {
-      const answerPrompt = `Here is a puzzle: ${generatedPuzzles}. Give short solution, no more than 80 words.`;
-  
-      const response = await fetch("/api/generateAnswer", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            answerPrompt,
-          }),
-        });
-  
-      if (!response.ok) {
-          throw new Error(response.statusText);
+      let answerPrompt = ""
+      if (locale=="ru"){
+        answerPrompt = `Вот головоломка: ${generatedPuzzles}. Дайте краткое решение, не более 80 слов.`;
+      } else {
+        answerPrompt = `Here is a puzzle: ${generatedPuzzles}. Give short solution, no more than 80 words.`;
       }
-  
+      setCorrectAnswer("");
+      const response = await fetch("/api/generateAnswer", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          answerPrompt,
+        }),
+      });
+    
+      if (!response.ok) {
+        throw new Error(response.statusText);
+      }
+    
       const data = response.body;
       if (!data) {
-          return;
+        return;
       }
-  
+    
       const onParse = (event: ParsedEvent | ReconnectInterval) => {
-          if (event.type === "event") {
-              const data = event.data;
-              try {
-                  const text = JSON.parse(data).text ?? "";
-                  setGeneratedAnswers((prev) => prev + text);
-              } catch (e) {
-                  console.error(e);
-              }
+        if (event.type === "event") {
+          const data = event.data;
+          try {
+            const text = JSON.parse(data).text ?? "";
+            setCorrectAnswer((prev) => prev + text);
+          } catch (e) {
+            console.error(e);
           }
+        }
       }
-  
+    
       const reader = data.getReader();
       const decoder = new TextDecoder();
       const parser = createParser(onParse);
       let done = false;
       while (!done) {
-          const { value, done: doneReading } = await reader.read();
-          done = doneReading;
-          const chunkValue = decoder.decode(value);
-          parser.feed(chunkValue);
+        const { value, done: doneReading } = await reader.read();
+        done = doneReading;
+        const chunkValue = decoder.decode(value);
+        parser.feed(chunkValue);
       }
-  }
+    }
+    
   
     return (
       <div className="flex max-w-5xl mx-auto flex-col items-center justify-center py-2 min-h-screen">
@@ -542,7 +562,8 @@ const Ranked: NextPage<{locale: string}> = ({locale}) => {
   
           {!loadingGenerate && !isPuzzleGenerated && (
             <button
-              className="bg-black rounded-xl text-white font-medium px-4 py-2 sm:mt-10 mt-8 hover:bg-black/80 w-full"
+              className="bg-yellow-800
+              rounded-xl text-white font-medium px-4 py-2 sm:mt-10 mt-8 hover:bg-yellow-800/90 w-full"
               onClick={(e) => generatePuzzle(e)}
             >
               {t('generate_puzzle')}
@@ -550,7 +571,7 @@ const Ranked: NextPage<{locale: string}> = ({locale}) => {
           )}
             {loadingGenerate && (
               <button
-                className="bg-black rounded-xl text-white font-medium px-4 py-2 sm:mt-10 mt-8 hover:bg-black/80 w-full"
+                className="bg-yellow-800 rounded-xl text-white font-medium px-4 py-2 sm:mt-10 mt-8 hover:bg-yellow-800/80 w-full"
                 disabled
               >
                 <LoadingDots color="white" style="large" />
@@ -670,7 +691,7 @@ const Ranked: NextPage<{locale: string}> = ({locale}) => {
                     </div>
                   </div>
                   <a
-                    className="underline text-purple-700 hover:text-purple-700 cursor-pointer mt-4"
+                    className="underline text-yellow-800 hover:text-yellow-600 cursor-pointer mt-4"
                     onClick={handleShowAnswer}
                   >
                     {t('show_answer')}
@@ -678,7 +699,7 @@ const Ranked: NextPage<{locale: string}> = ({locale}) => {
 
                   {showAnswer && (
                     <div className="mt-2 text-black">
-                      {t('answer')} {generatedAnswers}
+                      {t('answer')} {correctAnswer}
                     </div>
                   )}
                 </div>
@@ -703,5 +724,6 @@ const Ranked: NextPage<{locale: string}> = ({locale}) => {
       locale
     },
   })
+
   
-  export default Ranked;
+  export default withUsername(Ranked);

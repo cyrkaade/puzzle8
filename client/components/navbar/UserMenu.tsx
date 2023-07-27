@@ -1,9 +1,9 @@
 'use client';
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { AiOutlineMenu } from "react-icons/ai";
 import { signOut } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useRouter } from "next/router";
 import { useMediaQuery } from 'react-responsive';
 
 import useLoginModal from "../../hooks//useLoginModal";
@@ -12,7 +12,11 @@ import useRegisterModal from "../../hooks/useRegisterModal";
 import MenuItem from "./MenuItem";
 import { User } from "@prisma/client";
 import Avatar from "../Avatar";
+import Cookies from 'js-cookie';
 import { useTranslation } from 'next-i18next';
+
+
+
 
 interface UserMenuProps {
     currentUser?: User | null
@@ -33,9 +37,28 @@ interface UserMenuProps {
   }, []);
   const isDesktopOrLaptop = useMediaQuery({ query: '(min-width: 768px)' });
 
-  const { t } = useTranslation('common');
+  const { t, i18n } = useTranslation('common');
+  const changeLanguage = () => {
+    const currentPath = router.asPath;
+    const currentLocale = router.locale;
+    const defaultLocale = router.defaultLocale;
+    
+    const newPath = currentPath.replace(`/${currentLocale}/`, '/');
+    
+    if (currentLocale === 'en') {
+      i18n.changeLanguage('ru');
+      router.push(newPath, newPath, { locale: 'ru' });
+    } else {
+      i18n.changeLanguage('en');
+      router.push(newPath, newPath, { locale: 'en' });
+    }
+  };
+  
+  
+  
 
   return ( 
+    
     <div className="relative">
       <div className="flex flex-row items-center gap-3 w-[200px] justify-end">
 
@@ -64,8 +87,7 @@ interface UserMenuProps {
         </div>
       </div>
       {isOpen && (
-        <div 
-          className="
+        <div className="
             absolute 
             rounded-xl 
             shadow-md
@@ -95,7 +117,12 @@ interface UserMenuProps {
                   <hr />
                   </>
                 }
-                
+
+                <MenuItem 
+                  label={i18n.language === 'en' ? 'Language: EN' : 'Язык: RU'} 
+                  onClick={changeLanguage}
+                />
+
                 <MenuItem 
                   label={t('favorites')} 
                   onClick={() => router.push('/favorites')}
@@ -105,9 +132,14 @@ interface UserMenuProps {
                   label={t('logout')} 
                   onClick={() => signOut()}
                 />
+                <hr />
               </>
             ) : (
               <>
+                <MenuItem 
+                  label={i18n.language === 'en' ? 'Language: EN' : 'Язык: RU'} 
+                  onClick={changeLanguage}
+                />
                 <MenuItem 
                   label={t('login_title')} 
                   onClick={loginModal.onOpen}
@@ -122,7 +154,7 @@ interface UserMenuProps {
         </div>
       )}
     </div>
-   );
+  );
 }
  
 export default UserMenu;

@@ -43,7 +43,8 @@ const PuzzleItem: React.FC<PuzzleItemProps> = ({ generatedpuzzle, currentUser, p
     >
       {currentUser && (
       <div
-        className={`w-6 h-6 mr-4 text-purple-700 cursor-pointer transition duration-500 ease-in-out transform items-center ${isFavorited ? "scale-125" : ""}`}
+        className={`w-6 h-6 mr-4 text-amber-600
+        cursor-pointer transition duration-500 ease-in-out transform items-center ${isFavorited ? "scale-125" : ""}`}
         onClick={(e) => {
           e.stopPropagation();
           setFavorited(!isFavorited);
@@ -102,6 +103,7 @@ const Home: NextPage<{locale: string}> = ({locale}) => {
         if (data.user) {
           setCurrentUser(data.user);
           Cookies.remove('generationCount');
+          console.log(data.user)
         } else {
           console.error(data.error);
         }
@@ -198,6 +200,9 @@ style.slice(-1) === "." ? "" : "."
 
   return (
     <div className="flex max-w-5xl mx-auto flex-col items-center justify-center py-2 min-h-screen">
+
+      
+      
       <Head>
         <title>Puzzle8</title>
         <link rel="icon" href="/favicon.ico" />
@@ -223,7 +228,7 @@ style.slice(-1) === "." ? "" : "."
         <div className="max-w-xl w-full">
           <div className="flex mt-10 items-center space-x-3">
             <Image
-              src="/1-black.png"
+              src="/number-one.png"
               width={30}
               height={30}
               alt="1 icon"
@@ -246,7 +251,7 @@ style.slice(-1) === "." ? "" : "."
             }/>
 
           <div className="flex mb-5 items-center space-x-3">
-            <Image src="/2-black.png" width={30} height={30} alt="1 icon" />
+            <Image src="/number-two.png" width={30} height={30} alt="1 icon" />
             <p className="text-left font-medium">{t('type')}</p>
           </div>
           <div className="block">

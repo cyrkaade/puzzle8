@@ -5,6 +5,30 @@ import GithubProvider from "next-auth/providers/github"
 import GoogleProvider from "next-auth/providers/google"
 import { PrismaAdapter } from "@next-auth/prisma-adapter"
 import prisma from "../../../libs/prismadb"
+import { ExtendedUser } from '../../../types/next-auth'
+
+import { Session } from 'next-auth';
+
+interface ExtendedSession extends Session {
+  user: {
+    name?: string | null;
+    email?: string | null;
+    image?: string | null;
+    isUsernameSet?: boolean;
+    id?: string;
+    provider?: string; // new field
+  }
+}
+
+type Token = {
+  name?: string;
+  email?: string;
+  picture?: string;
+  sub?: string;
+  id?: string;
+  isUsernameSet: boolean;
+  provider?: string; // new field
+}
 
 export const authOptions: AuthOptions = {
   adapter: PrismaAdapter(prisma),
@@ -51,6 +75,37 @@ export const authOptions: AuthOptions = {
       }
     })
   ],
+  callbacks: {
+    async session({ session, token: unknownToken }) {
+      const token = unknownToken as Token; // Explicitly tell TypeScript that unknownToken is a Token
+    
+      const extendedSession: ExtendedSession = {
+        ...session,
+        user: {
+          ...session.user,
+          isUsernameSet: token?.isUsernameSet,
+          id: token?.id, // add it here if it exists
+          provider: token?.provider // add provider here if it exists
+        },
+      };
+      
+      return extendedSession;
+    },
+
+    async jwt({ token, user, account }) {
+      const extendedUser = user as ExtendedUser | null;
+      if (extendedUser) {
+        token = {
+          ...token,
+          isUsernameSet: extendedUser.isUsernameSet,
+          id: extendedUser.id,
+          provider: account?.provider
+        };
+      }
+      return token;
+    }
+  },
+  
   
   pages: {
     signIn: '/',

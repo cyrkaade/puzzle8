@@ -1,7 +1,18 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
 import Slider from '@mui/material/Slider';
+import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTranslation } from 'next-i18next';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+
+const theme = createTheme({
+  palette: {
+    secondary: {
+      main: '#d97706',
+    },
+  },
+});
+
 
 interface DiscreteSliderLabelProps {
   onChange: (value: number) => void;
@@ -9,8 +20,23 @@ interface DiscreteSliderLabelProps {
 
 export default function DiscreteSliderLabel({ onChange }: DiscreteSliderLabelProps) {
   const { t } = useTranslation('common');
+  
+  const isSmallScreen = useMediaQuery('(max-width:723px)');
 
-  const marks = [
+  const marks = isSmallScreen ? [
+    {
+      value: 25,
+      label: t('easy'),
+    },
+    {
+      value: 50,
+      label: t('medium'),
+    },
+    {
+      value: 75,
+      label: t('hard'),
+    },
+  ] : [
     {
       value: 0,
       label: t('very_easy'),
@@ -38,6 +64,7 @@ export default function DiscreteSliderLabel({ onChange }: DiscreteSliderLabelPro
   }
 
   return (
+    <ThemeProvider theme={theme}>
     <Box
       sx={{
         width: '100%',
@@ -59,5 +86,6 @@ export default function DiscreteSliderLabel({ onChange }: DiscreteSliderLabelPro
         onChange={(event, value) => onChange(value as number)}
       />
     </Box>
+    </ThemeProvider>
   );
 }

@@ -112,6 +112,9 @@ import { Dialog, Transition } from '@headlessui/react'
 import { Fragment } from 'react'
 import axios from "axios"
 import Header from "../components/navbar/Header"
+import { useTranslation } from "react-i18next"
+import { GetServerSideProps } from "next"
+import { serverSideTranslations } from "next-i18next/serverSideTranslations"
 
 
 interface FavoriteItemProps {
@@ -131,77 +134,81 @@ export type Favorite = {
 
 
 const API_URL = 'http://localhost:8000'; 
+
+import { withClientSideRendering } from "../actions/withClientSideRendering"
+import withUsername from "../actions/withUsername"
+// import withUsername from "../actions/withUsername"
  
-export const columns: ColumnDef<Favorite>[] = [
-  {
-    id: "select",
-    header: ({ table }) => (
-      <Checkbox
-        checked={table.getIsAllPageRowsSelected()}
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => {
+// export const columns: ColumnDef<Favorite>[] = [
+//   {
+//     id: "select",
+//     header: ({ table }) => (
+//       <Checkbox
+//         checked={table.getIsAllPageRowsSelected()}
+//         onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+//         aria-label="Select all"
+//       />
+//     ),
+//     cell: ({ row }) => (
+//       <Checkbox
+//         checked={row.getIsSelected()}
+//         onCheckedChange={(value) => {
           
-          row.toggleSelected(!!value)
-        }}
-        aria-label="Select row"
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false,
-  },
-  // {
-  //   accessorKey: "_id",
-  //   id: "_id",
-  //   header: "ID",
-  //   cell: ({ row }) => <div>{row.getValue("_id")}</div>,
-  // },
-    {
-      accessorKey: "puzzle_type",
-      header: "Puzzle Type",
-      cell: ({ row }) => <div className="capitalize">{row.getValue("puzzle_type")}</div>,
-    },
-    {
-      accessorKey: "puzzle",
-      id: 'puzzle',
-      header: "Puzzle",
-      cell: ({ row }) => <div>{row.getValue("puzzle")}</div>,
-    },
-  {
-    id: "actions",
-    enableHiding: false,
-    cell: ({ row }) => {
-      const puzzle = row.original
+//           row.toggleSelected(!!value)
+//         }}
+//         aria-label="Select row"
+//       />
+//     ),
+//     enableSorting: false,
+//     enableHiding: false,
+//   },
+//   // {
+//   //   accessorKey: "_id",
+//   //   id: "_id",
+//   //   header: "ID",
+//   //   cell: ({ row }) => <div>{row.getValue("_id")}</div>,
+//   // },
+//     {
+//       accessorKey: "puzzle_type",
+//       header: t('puzzle_type'),
+//       cell: ({ row }) => <div className="capitalize">{row.getValue("puzzle_type")}</div>,
+//     },
+//     {
+//       accessorKey: "puzzle",
+//       id: t('puzzle'),
+//       header: "Puzzle",
+//       cell: ({ row }) => <div>{row.getValue("puzzle")}</div>,
+//     },
+//   {
+//     id: "actions",
+//     enableHiding: false,
+//     cell: ({ row }) => {
+//       const puzzle = row.original
  
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="bg-white">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(puzzle.puzzle)}
-            >
-              Copy puzzle
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-          </DropdownMenuContent>
-        </DropdownMenu>
-      )
-    },
-  },
-]
+//       return (
+//         <DropdownMenu>
+//           <DropdownMenuTrigger asChild>
+//             <Button variant="ghost" className="h-8 w-8 p-0">
+//               <span className="sr-only">Open menu</span>
+//               <MoreHorizontal className="h-4 w-4" />
+//             </Button>
+//           </DropdownMenuTrigger>
+//           <DropdownMenuContent align="end" className="bg-white">
+//             <DropdownMenuLabel>Actions</DropdownMenuLabel>
+//             <DropdownMenuItem
+//               onClick={() => navigator.clipboard.writeText(puzzle.puzzle)}
+//             >
+//               Copy puzzle
+//             </DropdownMenuItem>
+//             <DropdownMenuSeparator />
+//           </DropdownMenuContent>
+//         </DropdownMenu>
+//       )
+//     },
+//   },
+// ]
  
-export default function DataTableDemo() {
+export function DataTableDemo() {
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -213,6 +220,7 @@ export default function DataTableDemo() {
   const [favorites, setFavorites] = useState<Favorite[]>([]);
   const [currentUser, setCurrentUser] = useState<{
     id: string;
+    username: string | null;
     name: string | null;
     email: string | null;
     emailVerified: Date | null;
@@ -222,9 +230,82 @@ export default function DataTableDemo() {
     updatedAt: Date;
     rating: number;
     favoriteIds: string[];
+    isUsernameSet: boolean | null;
+    provider: string | null;
   } | null>(null);
   const [dataChanged, setDataChanged] = useState(false);
   let [isOpen, setIsOpen] = useState(false)
+  const { t } = useTranslation('common');
+
+
+  const columns: ColumnDef<Favorite>[] = [
+    {
+      id: "select",
+      header: ({ table }) => (
+        <Checkbox
+          checked={table.getIsAllPageRowsSelected()}
+          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+          aria-label="Select all"
+        />
+      ),
+      cell: ({ row }) => (
+        <Checkbox
+          checked={row.getIsSelected()}
+          onCheckedChange={(value) => {
+            
+            row.toggleSelected(!!value)
+          }}
+          aria-label="Select row"
+        />
+      ),
+      enableSorting: false,
+      enableHiding: false,
+    },
+    // {
+    //   accessorKey: "_id",
+    //   id: "_id",
+    //   header: "ID",
+    //   cell: ({ row }) => <div>{row.getValue("_id")}</div>,
+    // },
+      {
+        accessorKey: "puzzle_type",
+        header: t('puzzle_type'),
+        cell: ({ row }) => <div className="capitalize">{row.getValue("puzzle_type")}</div>,
+      },
+      {
+        accessorKey: "puzzle",
+        id: 'puzzle',
+        header: t('puzzle'),
+        cell: ({ row }) => <div>{row.getValue("puzzle")}</div>,
+      },
+    {
+      id: "actions",
+      enableHiding: false,
+      cell: ({ row }) => {
+        const puzzle = row.original
+   
+        return (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <span className="sr-only">{t('open_menu')}</span>
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="bg-white">
+              <DropdownMenuLabel>{t('actions')}</DropdownMenuLabel>
+              <DropdownMenuItem
+                onClick={() => navigator.clipboard.writeText(puzzle.puzzle)}
+              >
+                {t('copy_puzzle')}
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )
+      },
+    },
+  ]
 
   
 
@@ -237,6 +318,12 @@ export default function DataTableDemo() {
     setIsOpen(true)
   }
   
+
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   useEffect(() => {
     // Log the rowSelection state to understand its structure
@@ -318,23 +405,25 @@ const deleteFavorites = async () => {
  
   return (
     <div>
-      
+      {/* @ts-ignore */}
       <Header currentUser={currentUser}/>
     <div className="w-full">
       <div className="flex items-center py-4">
-        <Input
-          placeholder="Search puzzles..."
-          value={(table.getColumn("puzzle")?.getFilterValue() as string) ?? ""}
-          onChange={(event) =>
-            table.getColumn("puzzle")?.setFilterValue(event.target.value)
-          }
-          className="max-w-sm"
-        />
+        {isMounted && (
+          <Input
+            placeholder={t('search')}
+            value={(table.getColumn("puzzle")?.getFilterValue() as string) ?? ""}
+            onChange={(event) =>
+              table.getColumn("puzzle")?.setFilterValue(event.target.value)
+            }
+            className="max-w-sm"
+          />
+        )}
         <Button variant="outline" 
         className={`ml-auto mr-20 sm:mr-80 ${selectedRows.length === 0 ? 'bg-black text-white cursor-not-allowed bg-opacity-60' : 'bg-black text-white hover:bg-opacity-80'}`} 
         onClick={selectedRows.length > 0 ? openModal : undefined}
         disabled={selectedRows.length === 0}>
-              Delete
+              {t('delete')}
           </Button>
     <>
       <Transition appear show={isOpen} as={Fragment}>
@@ -367,28 +456,28 @@ const deleteFavorites = async () => {
                     as="h3"
                     className="text-lg font-medium leading-6 text-gray-900"
                   >
-                    Are you sure to delete?
+                    {t('sure')}
                   </Dialog.Title>
                   <div className="mt-2">
                     <p className="text-sm text-gray-500">
-                      Action is unreversible.
+                      {t('unreversible')}
                     </p>
                   </div>
 
                   <div className="mt-4 flex space-x-2">
                     <button
                       type="button"
-                      className="inline-flex justify-center rounded-md border border-transparent bg-purple-700 px-4 py-2 text-sm font-medium text-white hover:bg-purple-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2"
+                      className="inline-flex justify-center rounded-md border border-transparent bg-yellow-800 px-4 py-2 text-sm font-medium text-white hover:bg-yellow-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500 focus-visible:ring-offset-2"
                       onClick={deleteFavorites}
                     >
-                      Delete
+                      {t('delete')}
                     </button>
                     <button
                       type="button"
                       className="inline-flex justify-center rounded-md border border-transparent bg-black px-4 py-2 text-sm font-medium text-white hover:bg-black hover:bg-opacity-70 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
                       onClick={closeModal}
                     >
-                      Cancel
+                      {t('cancel')}
                     </button>
                   </div>
                 </Dialog.Panel>
@@ -399,33 +488,6 @@ const deleteFavorites = async () => {
       </Transition>
     </>
         
-        {/* <DropdownMenu>
-          
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="ml-auto">
-              Columns <ChevronDown className="ml-2 h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            {table
-              .getAllColumns()
-              .filter((column) => column.getCanHide())
-              .map((column) => {
-                return (
-                  <DropdownMenuCheckboxItem
-                    key={column.id}
-                    className="capitalize"
-                    checked={column.getIsVisible()}
-                    onCheckedChange={(value) =>
-                      column.toggleVisibility(!!value)
-                    }
-                  >
-                    {column.id}
-                  </DropdownMenuCheckboxItem>
-                )
-              })}
-          </DropdownMenuContent>
-        </DropdownMenu> */}
       </div>
       <div className="rounded-md border">
         <Table>
@@ -470,7 +532,7 @@ const deleteFavorites = async () => {
                   colSpan={columns.length}
                   className="h-24 text-center"
                 >
-                  No results.
+                  {t('no_results')}
                 </TableCell>
               </TableRow>
             )}
@@ -479,8 +541,8 @@ const deleteFavorites = async () => {
       </div>
       <div className="flex items-center justify-end space-x-2 py-4">
         <div className="flex-1 text-sm text-muted-foreground">
-          {table.getFilteredSelectedRowModel().rows.length} of{" "}
-          {table.getFilteredRowModel().rows.length} row(s) selected.
+          {table.getFilteredSelectedRowModel().rows.length} {t('of')}{" "}
+          {table.getFilteredRowModel().rows.length} {t('rows_selected')}
         </div>
         <div className="space-x-2">
           <Button
@@ -489,7 +551,7 @@ const deleteFavorites = async () => {
             onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage()}
           >
-            Previous
+            {t('previous')}
           </Button>
           <Button
             variant="outline"
@@ -497,7 +559,7 @@ const deleteFavorites = async () => {
             onClick={() => table.nextPage()}
             disabled={!table.getCanNextPage()}
           >
-            Next
+            {t('next')}
           </Button>
         </div>
       </div>
@@ -505,3 +567,13 @@ const deleteFavorites = async () => {
     </div>
   )
 }
+
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => ({
+  props: {
+    ...await serverSideTranslations(locale as string, ['common']),
+  },
+});
+
+const DataTableDemoWithClientSideRendering = withClientSideRendering(DataTableDemo);
+
+export default withUsername(DataTableDemoWithClientSideRendering);

@@ -1,11 +1,11 @@
 import Link from "next/link";
 import useRegisterModal from "../../hooks/useRegisterModal";
 import { User } from "@prisma/client";
-import { signOut } from "next-auth/react";
-import { FaHeart } from 'react-icons/fa';
 import UserMenu from "./UserMenu";
 import { useMediaQuery } from 'react-responsive';
 import { useTranslation } from 'next-i18next';
+import { useRouter } from 'next/router';
+
 
 interface HeaderProps {
   currentUser?: User | null
@@ -14,19 +14,15 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> = ({
   currentUser,
 }) => {
-  const registerModal = useRegisterModal();
-
-  const isDesktopOrLaptop = useMediaQuery({
-    query: '(min-width: 768px)'
-  });
   const { t } = useTranslation('common');
+  
 
   return (
     <header className="flex justify-between items-center w-full mt-5 border-b-2 pb-4 sm:px-4 px-2">
       <Link href="/" className="flex space-x-3 -ml-2">
         <img
           alt="header text"
-          src="/writingIcon.png"
+          src="/reallogo.png"
           className="sm:w-12 sm:h-12 w-8 h-8"
           width={32}
           height={32}
@@ -42,8 +38,8 @@ const Header: React.FC<HeaderProps> = ({
       </div>
   
       <div className="flex items-center mr-2">
-        <UserMenu currentUser={currentUser} />
-      </div>
+      <UserMenu currentUser={currentUser} />
+    </div>
     </header>
   );
   

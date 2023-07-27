@@ -9,7 +9,8 @@ export default function Footer() {
           href="https://github.com/cyrkaade/"
           target="_blank"
           rel="noreferrer"
-          className="font-bold hover:underline transition underline-offset-2"
+          className="font-bold hover:underline transition underline-offset-2 "
+          
         >
           cyrkaade{" "}
         </a>

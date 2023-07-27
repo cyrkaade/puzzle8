@@ -44,8 +44,7 @@
     "create_account": "Create an account",
     "log_in": "Log in",
     "welcome": "Welcome to sherlck.",
-    "create_account": "Create an account!",
-    "name": "Name",
+    "username": "Username",
     "password": "Password",
     "registered": "Registered!",
     "logged": "Logged in",
@@ -59,7 +58,29 @@
 
     "Riddle": "Riddle",
     "Brainteaser": "Brainteaser",
-    "logic_puzzle": "Logical puzzle"
+    "logic_puzzle": "Logical puzzle",
+
+    "no_results": "No results.",
+    "rows_selected": "row(s) selected.",
+    "cancel": "Cancel",
+    "previous": "Previous",
+    "search": "Search puzzles...",
+    "puzzle_type": "Puzzle type",
+    "puzzle": "Puzzle",
+    "delete": "Delete",
+    "actions": "Actions",
+    "copy_puzzle": "Copy puzzle",
+    "sure": "Are you sure to delete?",
+    "unreversible": "Action is unreversible",
+    "of": "of",
+    "open_menu": "Open menu",
+
+    "username_choose": "Choose our username.",
+    "username_description": "From 4 to 16 characters without special symbols.",
+
+    "save": "Save",
+    "warning": "Username should be 4-16 characters long and contain only lowercase letters and numbers."
+
 
   }
   

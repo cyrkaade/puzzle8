@@ -6,6 +6,7 @@ import RegisterModal from "../components/RegisterModal";
 import LoginModal from "../components/LoginModal";
 import Cookies from 'js-cookie';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import withUsername from "../actions/withUsername";
 
 const Explore: NextPage = () => {
     const [currentUser, setCurrentUser] = useState<any | null>(null);
@@ -52,4 +53,4 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     };
   }
 
-export default Explore;
+export default withUsername(Explore);

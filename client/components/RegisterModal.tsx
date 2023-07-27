@@ -36,7 +36,7 @@ const RegisterModal= () => {
     },
   } = useForm<FieldValues>({
     defaultValues: {
-      name: '',
+      username: '',
       email: '',
       password: ''
     },
@@ -52,12 +52,16 @@ const RegisterModal= () => {
       loginModal.onOpen();
     })
     .catch((error) => {
-      toast.error(error.message || JSON.stringify(error));
+      if (error.response && error.response.data) {
+        toast.error(error.response.data.message);
+      } else {
+        toast.error(error.message || JSON.stringify(error));
+      }
     })
     .finally(() => {
       setIsLoading(false);
     })
-  }
+}
 
   const onToggle = useCallback(() => {
     registerModal.onClose();
@@ -79,8 +83,8 @@ const RegisterModal= () => {
         required
       />
       <Input
-        id="name"
-        label={t('name')}
+        id="username"
+        label={t('username')}
         disabled={isLoading}
         register={register}
         errors={errors}
