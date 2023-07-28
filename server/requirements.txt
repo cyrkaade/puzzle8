@@ -7,3 +7,4 @@ python-dotenv==0.21.1
 Requests==2.31.0
 spacy==3.6.0
 yake==0.4.8
+uvicorn
