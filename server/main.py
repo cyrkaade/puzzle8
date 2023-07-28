@@ -6,8 +6,8 @@ app = FastAPI()
 
 origins = [
     "http://localhost",
-    "http://localhost:3000",
-    "http://localhost:8000",
+    "https://sherlck.vercel.app",
+    "https://sherlck-backend.onrender.com",
 ]
 
 app.add_middleware(
