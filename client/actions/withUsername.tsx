@@ -1,8 +1,9 @@
-import { useSession, getSession } from 'next-auth/react';
+import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
-import { ExtendedUser, ExtendedSession } from '../types/next-auth';
+import { ExtendedSession } from '../types/next-auth';
 import { NextPage } from 'next';
+import Cookies from 'js-cookie';
 
 export default function withUsername(Component: NextPage<any, any>) {
   return function ProtectedRoute(props: any) {
@@ -11,14 +12,12 @@ export default function withUsername(Component: NextPage<any, any>) {
 
     useEffect(() => {
       if (status === 'loading') return;
-
-      if (session) {
-        const extendedUser = session?.user;
-        if (!extendedUser?.isUsernameSet) {
-          router.push('/set-username'); 
-        }
+    
+      const username = Cookies.get('username');
+      if (!username) {
+        router.push('/set-username'); 
       }
-    }, [session, status, router]);
+    }, [status, router]);
 
     if (status === 'loading') {
       return null;

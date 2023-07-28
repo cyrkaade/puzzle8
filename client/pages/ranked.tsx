@@ -91,7 +91,6 @@ const Ranked: NextPage<{locale: string}> = ({locale}) => {
     const [loadingGenerate, setLoadingGenerate] = useState(false);
     const [loadingSubmit, setLoadingSubmit] = useState(false);
     const [answer, setAnswer] = useState("");
-    const [ptype, setType] = useState<PuzzleType>("Riddle");
     let [difficulty, setDifficulty] = useState<string>("");
     const [generatedPuzzles, setGeneratedPuzzles] = useState<string>("");
     const [generatedAnswers, setGeneratedAnswers] = useState<String>("");
@@ -112,6 +111,8 @@ const Ranked: NextPage<{locale: string}> = ({locale}) => {
     const [imageURL, setImageURL] = useState('');
     const [isLastAnswerCorrect, setIsLastAnswerCorrect] = useState<boolean>(false);
     const [correctAnswer, setCorrectAnswer] = useState<String>("");
+    const puzzleTypes = ["Lateral Thinking Problem", "Logic Puzzle", "Mathematical Riddle", "Detective Riddle", "Coded Message", "Anagram Puzzle", "Trivia Puzzle"];
+
 
     
     
@@ -180,7 +181,16 @@ const Ranked: NextPage<{locale: string}> = ({locale}) => {
 
     
     
-  
+    
+    const updateUserRank = async () => {
+      if (currentUser) {
+        const response = await fetch(`${API_URL}/users/ranking/${currentUser.id}`);
+        const data = await response.json();
+        setUserRank(data.rank);
+      }
+    };
+
+
     useEffect(() => {
       fetch('/api/currentUser')
         .then((res) => res.json())
@@ -208,25 +218,28 @@ const Ranked: NextPage<{locale: string}> = ({locale}) => {
       generatePuzzle(e);
     }
 
-    const updateUserData = async () => {
-      const res = await fetch('/api/currentUser');
-      const data = await res.json();
-      if (data.user) {
-        let oldRating = userPoints;
-        let newRating = data.user.rating;
-        setCurrentUser(data.user);
-        setUserPoints(newRating);
+const updateUserData = async () => {
+  const res = await fetch('/api/currentUser');
+  const data = await res.json();
+  if (data.user) {
+    let oldRating = userPoints;
+    let newRating = data.user.rating;
+    setCurrentUser(data.user);
+    setUserPoints(newRating);
         
-        let difference = newRating - oldRating;
-        if (difference > 0) {
-          toast.success(`Rating +${difference}`);
-        } else if (difference < 0) {
-          toast.error(`Rating ${difference}`);
-        }
-      } else {
-        console.error(data.error);
-      }
-    };
+    let difference = newRating - oldRating;
+    if (difference > 0) {
+      toast.success(`Rating +${difference}`);
+    } else if (difference < 0) {
+      toast.error(`Rating ${difference}`);
+    }
+
+    updateUserRank();
+  } else {
+    console.error(data.error);
+  }
+};
+
 
     const handleSkip = async (e: any) => {
       e.preventDefault();
@@ -278,22 +291,7 @@ const Ranked: NextPage<{locale: string}> = ({locale}) => {
     else if (userPoints >= 2300)
         difficulty = "very hard"
 
-    let prompt: string
-    if (locale === 'ru'){ 
-    prompt = `Меня, как искусственного интеллекта, попросили создать уникальную головоломку, специально разработанную для пользователя, с уровнем сложности $ ${difficulty}. Головоломка может быть заданием, логической задачей, детективным сценарием или любой другой формой умственно сложной задачи.
 
-    Ключевые факторы, которые я должен учитывать, заключаются в том, что головоломка должна быть инновационной и необычной, тем самым предоставляя игроку новый вызов. Учитывая уровень сложности, мне нужно убедиться, что сложность головоломки соответствующая, не слишком простая и не слишком усложненная, чтобы поддерживать интерес и вовлеченность пользователя.
-    
-    Итак, давайте сейчас создадим эту уникальную головоломку. Количество слов должно составлять максимум 90 слов. Пожалуйста, имейте в виду, что эта головоломка предназначена исключительно для пользователя и имеет уровень сложности ${difficulty}. Сгенерируй только текст пазла сразу же без ответов и только один пазл. Лимит: Максимум 90 слов.`;
-  }
-  else {
-    prompt = `As an artificial intelligence, I have been asked to create a unique puzzle specifically designed for a user and difficulty level of ${difficulty}. The puzzle can be a brainteaser, a logical problem, a detective scenario or any other form of mentally challenging task.
-
-    The key factors I must consider are that the puzzle should be innovative and uncommon, thereby providing a fresh challenge for the player. Considering the difficulty level, I need to ensure that the complexity of the puzzle is appropriate, neither too simple nor too complex, to maintain the user's interest and engagement.
-    
-    So, let's create this unique puzzle now. Word count should be maximum 90 words. Please bear in mind that this puzzle is exclusively designed for a user and difficulty level of ${difficulty}. Generate only puzzle text. Maximum word limit: 90 words.`;
-  }
-  
     const generatePuzzle = async (e: any) => {
       setIsPuzzleGenerated(false);
       setTimerMessage(null);
@@ -303,6 +301,29 @@ const Ranked: NextPage<{locale: string}> = ({locale}) => {
       setGeneratedPuzzles("");
       setImageURL("")
       setIsLastAnswerCorrect(false);
+      const puzzle_type = puzzleTypes[Math.floor(Math.random() * puzzleTypes.length)];
+
+      let prompt: string
+      if (locale === 'ru'){ 
+        prompt = `Как продвинутый ИИ, создайте уникальную головоломку специально для пользователя со сложностью ${difficulty}. Эта головоломка должна быть:
+
+        1. Инновационной и необычной, не включающей в себя клишированных тем, таких как "два стража и дилемма ложь/правда".
+        2. Соответствующей указанному уровню сложности, привлекая интерес пользователя, не будучи слишком простой или чрезмерно сложной.
+        3. Состоять из 80 до 180 слов, представляя собой краткое задание.
+        
+        Для этого запроса создайте головоломку, которая относится к категории ${puzzle_type}. Это может быть задача на сообразительность, математическая головоломка, тайная загадка, задание на невербальное мышление, детективный сценарий или любая другая умственно стимулирующая задача, требующая латерального мышления. Избегайте явных решений в самом тексте головоломки и выведите только текст головоломки.`;        
+      }
+
+      else {
+        prompt = `As an advanced AI, create a unique puzzle specifically for a user with a difficulty level of ${difficulty}. This puzzle should be:
+
+        1. Innovative and uncommon, not involving clichéd themes like 'two guards and a lie/truth dilemma'.
+        2. Appropriate for the specified difficulty level, engaging the user's interest without being overly simple or excessively complex.
+        3. Comprised of 80 to 180 words, offering a concise challenge.
+        
+        For this request, generate a puzzle that falls under the category of ${puzzle_type}. This could be a brainteaser, mathematical conundrum, cryptic riddle, non-verbal reasoning challenge, detective scenario, or any other mentally stimulating task requiring lateral thinking. Avoid explicit solutions within the puzzle text itself.`;
+        
+      }
       setLoadingGenerate(true);
       if (!currentUser) {
         const generationCount = Cookies.get('generationCount') ? parseInt(Cookies.get('generationCount') as string) : 0;
@@ -385,7 +406,8 @@ const Ranked: NextPage<{locale: string}> = ({locale}) => {
     };
 
 
-    const answer_prompt = `I have logical puzzle: ${generatedPuzzles}. The user gave the answer: ${answer}. Please, check the user's answer and give me response only 1 word without spaces and other words and dots and other symbols, WITHOUT DOTS just word: "Correct" or "Incorrect"`;
+    const answer_prompt = `Here is a logical puzzle: ${generatedPuzzles}. The user's proposed solution is: ${answer}. Please evaluate this answer accurately. The response should be a SINGLE word, devoid of spaces, symbols, or punctuation. The ONLY valid responses are "Correct" or "Incorrect". Please follow these guidelines strictly.`;
+
     
 
 
@@ -488,10 +510,12 @@ const Ranked: NextPage<{locale: string}> = ({locale}) => {
 
     const generateAnswer = async () => {
       let answerPrompt = ""
-      if (locale=="ru"){
-        answerPrompt = `Вот головоломка: ${generatedPuzzles}. Дайте краткое решение, не более 80 слов.`;
+      if (locale==='ru'){
+        answerPrompt = `На основе представленной головоломки, ${generatedPuzzles}, предоставьте краткое и точное решение. Помните, что объяснение не должно превышать 80 слов и оно должно корректно решить головоломку. Избегайте ненужной детализации или несвязанной информации в вашем ответе.`;
+
       } else {
-        answerPrompt = `Here is a puzzle: ${generatedPuzzles}. Give short solution, no more than 80 words.`;
+        answerPrompt = `Based on the provided puzzle, ${generatedPuzzles}, provide a succinct and accurate solution. Remember, the explanation should not exceed 80 words and it must correctly resolve the puzzle. Ensure to avoid unnecessary elaboration or unrelated information in your response.`;
+
       }
       setCorrectAnswer("");
       const response = await fetch("/api/generateAnswer", {
@@ -723,7 +747,6 @@ const Ranked: NextPage<{locale: string}> = ({locale}) => {
   export const getServerSideProps: GetServerSideProps = async (context) => {
     const { req, locale } = context;
   
-    // Get the user's session based on the request
     const session = await getSession({ req });
   
     if (!session) {
@@ -738,7 +761,7 @@ const Ranked: NextPage<{locale: string}> = ({locale}) => {
     return {
       props: {
         ...(await serverSideTranslations(locale as string, ['common'])),
-        // otherPropsYouMightNeed...
+        locale, 
       },
     };
   }

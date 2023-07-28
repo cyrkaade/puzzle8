@@ -21,12 +21,12 @@ export default async function handler(
         });
       }
 
-      await prisma.user.update({
+      const updatedUser = await prisma.user.update({
         where: { id: userId },
         data: { username, isUsernameSet: true },
       });
 
-      res.status(200).json({ success: true });
+      res.status(200).json({ user: updatedUser, success: true });
 
     } catch (error: any) {
       if (error.code === 'P2002') {

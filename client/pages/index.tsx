@@ -253,7 +253,6 @@ style.slice(-1) === "." ? "" : "."
               <span className="text-slate-500">
                 {t('graystyle')}
               </span>
-              .
             </p>
           </div>
           <Textarea value={style}

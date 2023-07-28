@@ -47,7 +47,6 @@ return (
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { req, locale } = context;
 
-  // Get the user's session based on the request
   const session = await getSession({ req });
 
   if (!session) {
@@ -62,7 +61,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   return {
     props: {
       ...(await serverSideTranslations(locale as string, ['common'])),
-      // otherPropsYouMightNeed...
+      locale, 
     },
   };
 }

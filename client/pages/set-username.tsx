@@ -17,6 +17,7 @@ import { useTranslation } from 'react-i18next';
 import { GetStaticProps } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Head from 'next/head';
+import Cookies from 'js-cookie';
 
 
 export default function SetUsername() {
@@ -25,7 +26,7 @@ export default function SetUsername() {
   const { data: session } = useSession();
   const [username, setUsername] = useState('');
   const [message, setMessage] = useState('');
-  const [loading, setLoading] = useState(false); // introduce loading state
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   const handleSubmit = async (e:any) => {
@@ -48,10 +49,11 @@ export default function SetUsername() {
         });
   
         if (response.ok) {
-          // This will help you update the session without causing a re-render or redirection.
-          await getSession();
+          const { user } = await response.json();
+          Cookies.set('username', user.username);
           router.push('/');
-        } else {
+        }
+         else {
           const { message } = await response.json();
           setMessage(message);
         }
