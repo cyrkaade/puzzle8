@@ -48,8 +48,7 @@ export default function SetUsername() {
         });
   
         if (response.ok) {
-          // @ts-ignore
-          signIn(session.user.provider, { callbackUrl: '/', redirect: false });
+          // This will help you update the session without causing a re-render or redirection.
           await getSession();
           router.push('/');
         } else {
@@ -64,6 +63,8 @@ export default function SetUsername() {
       }
     }
   };
+  
+  
   
   
 
