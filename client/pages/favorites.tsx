@@ -62,7 +62,7 @@ export type Favorite = {
 }
 
 
-const API_URL = 'https://sherlck-backend.onrender.com/'; 
+const API_URL = 'https://sherlck-backend.onrender.com'; 
 
 import { withClientSideRendering } from "../actions/withClientSideRendering"
 import withUsername from "../actions/withUsername"

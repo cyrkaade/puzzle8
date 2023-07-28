@@ -34,7 +34,7 @@ interface PuzzleItemProps {
 const PuzzleItem: React.FC<PuzzleItemProps> = ({ generatedpuzzle, currentUser, ptype }) => {
   const [isFavorited, setFavorited] = useState(false);
   const { t } = useTranslation('common');
-  const API_URL = 'https://sherlck-backend.onrender.com/';
+  const API_URL = 'https://sherlck-backend.onrender.com';
   return (
     <div
       className="bg-white rounded-xl shadow-md p-4 hover:bg-gray-100 transition cursor-copy border flex items-center"
