@@ -11,10 +11,19 @@ export default async function handler(
     const { userId, username } = req.body;
 
     try {
-      const user = await prisma.user.update({
+      const user = await prisma.user.findUnique({
         where: { id: userId },
-        data: { username: username, isUsernameSet: true },
-        
+      });
+      if (user && user.username?.startsWith('temp-')) {
+        await prisma.user.update({
+          where: { id: userId },
+          data: { username: null },
+        });
+      }
+
+      await prisma.user.update({
+        where: { id: userId },
+        data: { username, isUsernameSet: true },
       });
 
       res.status(200).json({ success: true });

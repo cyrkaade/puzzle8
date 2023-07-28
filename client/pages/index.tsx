@@ -21,6 +21,8 @@ import Cookies from 'js-cookie';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { Textarea } from "../@/components/ui/textarea";
+import { useRouter } from "next/router";
+import withUsername from "../actions/withUsername";
 
 
 interface PuzzleItemProps {
@@ -95,6 +97,14 @@ const Home: NextPage<{locale: string}> = ({locale}) => {
   const [currentUser, setCurrentUser] = useState(null);
   const { t,i18n } = useTranslation('common');
 
+  const router = useRouter();
+
+  useEffect(() => {
+    if (router.query.loginRequired === 'true') {
+      toast.error('Please, login to an account to have access to this page.');
+    }
+  }, [router.query]);
+
 
   useEffect(() => {
     fetch('/api/currentUser')
@@ -111,8 +121,8 @@ const Home: NextPage<{locale: string}> = ({locale}) => {
   }, []);
 
   useEffect(() => {
-    if (i18n.isInitialized) { // or i18n.language === locale
-      setType(t('Riddle') as PuzzleType); // Translate here
+    if (i18n.isInitialized) {
+      setType(t('Riddle') as PuzzleType); 
     }
   }, [i18n.isInitialized, t]);
 

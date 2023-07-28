@@ -21,7 +21,9 @@ import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { Textarea } from "../@/components/ui/textarea";
 import withUsername from "../actions/withUsername";
-import { getSession } from "../actions/getCurrentUser";
+import { getSessionNow } from "../actions/getCurrentUser";
+import { getSession } from "next-auth/react";
+
 // import withUsername from "../actions/withUsername";
 
 
@@ -718,12 +720,29 @@ const Ranked: NextPage<{locale: string}> = ({locale}) => {
     );
   };
 
-  export const getStaticProps: GetStaticProps = async ({ locale }) => ({
-    props: {
-      ...await serverSideTranslations(locale as string, ['common']),
-      locale
-    },
-  })
+
+  export const getServerSideProps: GetServerSideProps = async (context) => {
+    const { req, locale } = context;
+  
+    // Get the user's session based on the request
+    const session = await getSession({ req });
+  
+    if (!session) {
+      return {
+        redirect: {
+          destination: '/?loginRequired=true',
+          permanent: false,
+        },
+      }
+    }
+  
+    return {
+      props: {
+        ...(await serverSideTranslations(locale as string, ['common'])),
+        // otherPropsYouMightNeed...
+      },
+    };
+  }
 
   
   export default withUsername(Ranked);

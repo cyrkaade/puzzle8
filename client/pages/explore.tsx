@@ -7,6 +7,8 @@ import LoginModal from "../components/LoginModal";
 import Cookies from 'js-cookie';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import withUsername from "../actions/withUsername";
+import { getSession } from "next-auth/react";
+import { toast } from 'react-hot-toast';
 
 const Explore: NextPage = () => {
     const [currentUser, setCurrentUser] = useState<any | null>(null);
@@ -43,15 +45,27 @@ return (
 )
 }
 export const getServerSideProps: GetServerSideProps = async (context) => {
-    const { locale } = context;
-  
+  const { req, locale } = context;
+
+  // Get the user's session based on the request
+  const session = await getSession({ req });
+
+  if (!session) {
     return {
-      
-      props: {
-        ...(await serverSideTranslations(locale as string, ['common'])),
-        // otherPropsYouMightNeed...
+      redirect: {
+        destination: '/?loginRequired=true',
+        permanent: false,
       },
-    };
+    }
   }
+
+  return {
+    props: {
+      ...(await serverSideTranslations(locale as string, ['common'])),
+      // otherPropsYouMightNeed...
+    },
+  };
+}
+
 
 export default withUsername(Explore);

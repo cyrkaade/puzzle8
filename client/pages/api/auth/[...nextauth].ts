@@ -92,11 +92,21 @@ export const authOptions: AuthOptions = {
       return extendedSession;
     },
 
+
     async jwt({ token, user, account }) {
       const extendedUser = user as ExtendedUser | null;
       if (extendedUser) {
+        let username = extendedUser.username;
+        if(!username) {
+          username = `temp-${extendedUser.id}`;
+          await prisma.user.update({
+            where: { id: extendedUser.id },
+            data: { username },
+          });
+        }
         token = {
           ...token,
+          username,
           isUsernameSet: extendedUser.isUsernameSet,
           id: extendedUser.id,
           provider: account?.provider

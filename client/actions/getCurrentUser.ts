@@ -5,13 +5,13 @@ import prisma from '../libs/prismadb'
 
 import dynamic from 'next/dynamic'
 
-export async function getSession() {
+export async function getSessionNow() {
   return await getServerSession(authOptions)
 }
 
 export default async function getCurrentUser() {
     try {
-      const session = await getSession();
+      const session = await getSessionNow();
   
       if (!session?.user?.email) {
         return null;
