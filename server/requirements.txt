@@ -1,0 +1,9 @@
+certifi==2023.5.7
+fastapi==0.100.1
+openai==0.27.4
+pydantic==1.10.9
+pymongo==4.4.0
+python-dotenv==1.0.0
+Requests==2.31.0
+spacy==3.6.0
+yake==0.4.8
