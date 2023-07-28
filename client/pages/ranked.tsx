@@ -27,7 +27,7 @@ import { getSession } from "next-auth/react";
 // import withUsername from "../actions/withUsername";
 
 
-const API_URL = 'http://localhost:8000';
+const API_URL = 'https://sherlck-backend.onrender.com/';
 
 interface PuzzleItemProps {
     generatedpuzzle: string;
