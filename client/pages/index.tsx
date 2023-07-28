@@ -113,7 +113,6 @@ const Home: NextPage<{locale: string}> = ({locale}) => {
         if (data.user) {
           setCurrentUser(data.user);
           Cookies.remove('generationCount');
-          console.log(data.user)
         } else {
           console.error(data.error);
         }

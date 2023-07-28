@@ -14,7 +14,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     });
 
     if (!response.data) throw new Error('Unable to get image');
-    console.log('received url ' + response.data.data[0].url);
 
     res.status(200).json({ imageURL: response.data.data[0].url })
 }

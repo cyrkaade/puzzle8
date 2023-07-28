@@ -32,7 +32,6 @@ export default async function handler(
       if (error.code === 'P2002') {
         res.status(400).json({ message: 'This username is already in use' });
       } else {
-        console.error(error);
         res.status(500).json({ message: 'Unexpected error, please try again' });
       }
     }

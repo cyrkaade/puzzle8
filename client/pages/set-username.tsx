@@ -56,7 +56,6 @@ export default function SetUsername() {
           setMessage(message);
         }
       } catch (error) {
-        console.error(error);
         setMessage('Unexpected error, please try again');
       } finally {
         setLoading(false);

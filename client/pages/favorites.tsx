@@ -259,8 +259,6 @@ export function DataTableDemo() {
 
   useEffect(() => {
     // Log the rowSelection state to understand its structure
-    console.log('rowSelection:', rowSelection);
-    console.log(rowSelection)
   
     // Assuming rowSelection is an array of selected row objects
     setSelectedRows(Object.values(rowSelection));
@@ -273,7 +271,6 @@ export function DataTableDemo() {
       .then((data) => {
         if (data.user) {
           setCurrentUser(data.user);
-          // console.log
         } else {
           console.error(data.error);
         }
