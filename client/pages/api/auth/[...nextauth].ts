@@ -6,7 +6,7 @@ import GoogleProvider from "next-auth/providers/google"
 import { PrismaAdapter } from "@next-auth/prisma-adapter"
 import prisma from "../../../libs/prismadb"
 import { ExtendedUser } from '../../../types/next-auth'
-
+import { setCookie } from 'nookies';
 import { Session } from 'next-auth';
 
 interface ExtendedSession extends Session {
@@ -103,6 +103,8 @@ export const authOptions: AuthOptions = {
             where: { id: extendedUser.id },
             data: { username },
           });
+
+          setCookie(undefined, 'username', username, { path: '/' }); 
         }
         token = {
           ...token,
