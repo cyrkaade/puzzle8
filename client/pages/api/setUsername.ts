@@ -26,7 +26,12 @@ export default async function handler(
         data: { username, isUsernameSet: true },
       });
 
-      res.status(200).json({ user: updatedUser, success: true });
+      if (updatedUser) {
+        res.setHeader('Set-Cookie', `username=${updatedUser.username}; Path=/; HttpOnly; SameSite=Lax;`);
+        res.status(200).json({ user: updatedUser, success: true });
+      } else {
+        throw new Error("Could not update user username");
+      }
 
     } catch (error: any) {
       if (error.code === 'P2002') {
