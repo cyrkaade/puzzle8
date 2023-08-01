@@ -258,7 +258,7 @@ style.slice(-1) === "." ? "" : "."
           <Textarea value={style}
             onChange={(e) => setStyle(e.target.value)}
             rows={4}
-            className="w-full rounded-md border-gray-300 shadow-sm focus:border-black focus:ring-black my-5"
+            className="w-full rounded-md border-gray-300 shadow-sm focus:border-black focus:ring-black my-5 light-mode"
             placeholder={
               `${t('egstyle')}`
             }/>
