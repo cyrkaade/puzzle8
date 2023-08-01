@@ -15,8 +15,6 @@ export default function withUsername(Component: NextPage<any, any>) {
       if (status === 'loading') return;
     
       const username = Cookies.get('username');
-      console.log("Username from cookies:", username);
-      console.log("Session data:", session);
     
       if (!username) {
         router.push('/set-username'); 

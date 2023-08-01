@@ -95,9 +95,6 @@ export const authOptions: AuthOptions = {
 
     async jwt({ token, user, account }) {
       const extendedUser = user as ExtendedUser | null;
-      console.log("JWT callback - token:", token);
-      console.log("JWT callback - user:", user);
-      console.log("JWT callback - account:", account);
       if (extendedUser) {
         let username = extendedUser.username;
         if(!username) {

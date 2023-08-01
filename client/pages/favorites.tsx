@@ -525,4 +525,4 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
 const DataTableDemoWithClientSideRendering = withClientSideRendering(DataTableDemo);
 
-export default withUsername(DataTableDemoWithClientSideRendering);
+export default DataTableDemoWithClientSideRendering;

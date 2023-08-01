@@ -23,6 +23,7 @@ import { Textarea } from "../@/components/ui/textarea";
 import withUsername from "../actions/withUsername";
 import { getSessionNow } from "../actions/getCurrentUser";
 import { getSession } from "next-auth/react";
+import { useRouter } from "next/router";
 
 // import withUsername from "../actions/withUsername";
 
@@ -112,6 +113,8 @@ const Ranked: NextPage<{locale: string}> = ({locale}) => {
     const [isLastAnswerCorrect, setIsLastAnswerCorrect] = useState<boolean>(false);
     const [correctAnswer, setCorrectAnswer] = useState<String>("");
     const puzzleTypes = ["Lateral Thinking Problem", "Logic Puzzle", "Mathematical Riddle", "Detective Riddle", "Coded Message", "Anagram Puzzle", "Trivia Puzzle"];
+
+    const router = useRouter()
 
 
     
@@ -204,6 +207,9 @@ const Ranked: NextPage<{locale: string}> = ({locale}) => {
             Cookies.remove('generationCount');
           } else {
             console.error(data.error);
+          }
+          if (!data.user.isUsernameSet) {
+            router.push('/set-username');
           }
         });
     }, []);
@@ -767,4 +773,4 @@ const updateUserData = async () => {
   }
 
   
-  export default withUsername(Ranked);
+  export default Ranked;

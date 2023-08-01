@@ -67,4 +67,4 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 }
 
 
-export default withUsername(Explore);
+export default Explore;
