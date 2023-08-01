@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { ExtendedSession } from '../types/next-auth';
 import { NextPage } from 'next';
 import { parseCookies } from 'nookies';
+import Cookies from 'js-cookie';
 
 export default function withUsername(Component: NextPage<any, any>) {
   return function ProtectedRoute(props: any) {
@@ -13,7 +14,7 @@ export default function withUsername(Component: NextPage<any, any>) {
     useEffect(() => {
       if (status === 'loading') return;
     
-      const { username } = parseCookies();
+      const username = Cookies.get('username');
       if (!username) {
         router.push('/set-username'); 
       }

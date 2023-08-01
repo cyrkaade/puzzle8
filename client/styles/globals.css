@@ -81,3 +81,8 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+.light-mode {
+  background: white !important;
+  color: black !important;
+}
