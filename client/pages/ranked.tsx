@@ -642,7 +642,7 @@ const updateUserData = async () => {
               setIsError(false);
             }}
             rows={4}
-            className="w-full rounded-md border-gray-300 shadow-sm focus:border-black focus:ring-black my-5"
+            className="w-full rounded-md border-gray-300 shadow-sm focus:border-black focus:ring-black my-5 light-mode"
             placeholder={
               `${t('placeholder_text')}`
             }/>
