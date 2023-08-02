@@ -99,11 +99,30 @@ const Home: NextPage<{locale: string}> = ({locale}) => {
 
   const router = useRouter();
 
+  const modalRefStart = useRef<any>(null);
+  const modalRefTypes = useRef<any>(null);
+  
+
+  const showModalStart = () => {
+    modalRefStart.current.showModal();
+  };
+  
+  const showModalTypes = () => {
+    modalRefTypes.current.showModal();
+  };
+
   useEffect(() => {
     if (router.query.loginRequired === 'true') {
       toast.error('Please, login to an account to have access to this page.');
+
+      const { loginRequired, ...restQuery } = router.query;
+      const newQuery = new URLSearchParams(restQuery as Record<string, string>).toString();
+      const newUrl = newQuery ? `${router.pathname}?${newQuery}` : router.pathname;
+      
+      router.replace(newUrl, undefined, { shallow: true });
     }
   }, [router.query]);
+  
 
 
   useEffect(() => {
@@ -224,20 +243,32 @@ style.slice(-1) === "." ? "" : "."
     <img className="hidden lg:block absolute left-10 bottom-30 sm:w-28 md:w-28 lg:w-32 z-0" src="/10.png" alt="Heart" /> 
     <img className="hidden lg:block absolute right-10 bottom-[-200px] sm:w-28 md:w-32 lg:w-48 z-0" src="/12.png" alt="Square" /> */}
 
-
-        <a
-          className="flex max-w-fit items-center justify-center space-x-2 rounded-full border border-gray-300 bg-white px-4 py-2 text-sm text-gray-600 shadow-md transition-colors hover:bg-gray-100 mb-5"
-          href="https://github.com/cyrkaade/sherlck"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Github />
-          <p>Star on GitHub</p>
-        </a>
         <h1 className="sm:text-6xl text-4xl max-w-[708px] font-bold text-slate-900">
         {t('home_title')}
         </h1>
-        <p className="text-slate-500 mt-5">52 users overall</p>
+        <a className="text-slate-500 mt-5 cursor-pointer hover:underline" onClick={showModalStart}>{t('first_time')}</a>
+        <dialog ref={modalRefStart} id="my_modal_5" className="modal modal-bottom sm:modal-middle" data-theme="light">
+          <form method="dialog" className="modal-box">
+            <h3 className="font-bold text-lg">{t('welcome')}</h3>
+            <img src="logos.png"/>
+            <p className="py-4 text-left">
+            {t('excited')}
+            <ul>
+              <li><strong>{t('main_page')}.</strong>: {t('forwhat')}.</li>
+              <li><strong>{t('ranked')}.</strong>: {t('engage')}</li>
+              <li><strong>{t('favorites')}.</strong>: {t('easily')}</li>
+              <li><strong>{t('explore')}.</strong>: {t('increase')}</li>
+            </ul>
+          </p>
+          <p className="py-4 text-left">
+          {t('calling')}
+          </p>
+
+            <div className="modal-action">
+              <button className="btn">{t('close')}</button>
+            </div>
+          </form>
+        </dialog>
 
         <div className="max-w-xl w-full">
           <div className="flex mt-10 items-center space-x-3">
@@ -266,10 +297,41 @@ style.slice(-1) === "." ? "" : "."
           <div className="flex mb-5 items-center space-x-3">
             <Image src="/number-two.png" width={30} height={30} alt="1 icon" />
             <p className="text-left font-medium">{t('type')}</p>
+            <div onClick={showModalTypes} className="cursor-pointer">
+            <Image src="/info.png" width={20} height={20} alt="Tooltip Icon" />
+          </div>
           </div>
           <div className="block">
             <DropDown ptype={ptype} setType={(newType) => setType(newType)} />
           </div>
+
+          <div>
+          <dialog ref={modalRefTypes} id="my_modal_5" className="modal modal-bottom sm:modal-middle" data-theme="light">
+  <form method="dialog" className="modal-box">
+    <h3 className="font-bold text-lg">{t('types_header')}</h3>
+    <img src="puzzle.jpg" />
+    <p className="py-4 text-left">
+      <strong>{t('Puzzle')}:</strong>{t('riddle_description')}
+    </p>
+    <p className="py-4 text-left">
+      <strong>{t('logical_puzzle')}:</strong> {t('logical_description')}
+    </p>
+    <p className="py-4 text-left">
+      <strong>{t('Brainteaser')}:</strong> {t('brainteaser_description')}
+    </p>
+    <p className="py-4 text-left">
+      <strong>{t('Anagram')}:</strong> {t('anagram_description')}
+    </p>
+    <p className="py-4 text-left">
+      <strong>{t('Trivia')}:</strong> {t('trivia_description')}
+    </p>
+    <div className="modal-action">
+      <button className="btn">{t('close')}</button>
+    </div>
+  </form>
+</dialog>
+
+        </div>
 
           <div className="flex items-center space-x-3 mt-5">
             <Image src="/number-three.png" width={30} height={30} alt="1 icon" />

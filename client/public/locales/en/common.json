@@ -20,6 +20,7 @@
     "answer": "Answer:",
     "limit": "I'm sorry, it seems like you've already used up all your generations. To get unlimited generations, please sign up.",
     "copy": "puzzle copied to clipboard",
+    "close": "Close",
 
     "favorites": "My favorites",
     "login_title": "Login",
@@ -59,6 +60,8 @@
     "Riddle": "Riddle",
     "Brainteaser": "Brainteaser",
     "logic_puzzle": "Logical puzzle",
+    "Trivia": "Trivia puzzle",
+    "Anagram": "Anagram puzzle",
 
     "no_results": "No results.",
     "rows_selected": "row(s) selected.",
@@ -79,7 +82,23 @@
     "username_description": "From 4 to 16 characters without special symbols.",
 
     "save": "Save",
-    "warning": "Username should be 4-16 characters long and contain only lowercase letters and numbers."
+    "warning": "Username should be 4-16 characters long and contain only lowercase letters and numbers.",
+
+    "riddle_description":"A riddle is a statement or question with a double or hidden meaning that constitutes a puzzle to be solved. Often used in folklore or as brainteasers, riddles require creative thinking and the application of lateral thinking skills to figure out the answer.",
+    "logical_description":"Logical puzzles, also known as logic problems, require the solver to deduce the correct answer using deductive reasoning from a given set of statements. These puzzles are typically presented in the form of a story, and solvers must analyze the information, make logical inferences, and arrive at a solution that obeys all the given conditions.",
+    "brainteaser_desription":"A brainteaser is a type of puzzle that requires non-traditional thinking, also known as \"thinking outside the box.\" These puzzles often challenge the solver's ability to see underlying patterns or connections that are not immediately obvious, requiring creative problem-solving skills.",
+    "anagram_description":"An anagram puzzle involves rearranging the letters of a word or phrase to produce a new word or phrase using all the original letters exactly once. Anagrams often require a strong understanding of language and vocabulary, as well as the ability to recognize potential patterns and combinations within the given letters.",
+    "trivia_description":"Trivia puzzles test the solver's general knowledge on various subjects, including history, science, pop culture, and more. These puzzles are typically presented in the form of questions and can be multiple-choice or open-ended. Solving trivia puzzles requires a wide-ranging knowledge base and the ability to recall specific facts and information.",
+
+    "types_header":"Puzzle Types at sherlck",
+    "calling":"If you haven't registered yet, just head to the menu in the right-top corner and click “Create account.” Join us now - it's completely free!",
+    "increase":"Increase your critical thinking and problem solving abilities by exploring our courses. For the first 10 000 users it's completely free!",
+    "easily":"Easily find and manage your favorite puzzles.",
+    "engage":"Engage in competitive puzzle solving and rank against other enthusiasts.",
+    "forwhat":"For generating and saving your unique puzzles.",
+    "excited":"We're excited to have you explore our puzzle-loving community. Whether you're a puzzle enthusiast or a competitive solver, sherlck offers an extensive array of puzzles to generate, save, and solve.",
+
+    "main_page": "Main page"
 
 
   }
