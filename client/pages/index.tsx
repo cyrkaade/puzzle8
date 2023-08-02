@@ -254,10 +254,10 @@ style.slice(-1) === "." ? "" : "."
             <p className="py-4 text-left">
             {t('excited')}
             <ul>
-              <li><strong>{t('main_page')}.</strong>: {t('forwhat')}.</li>
-              <li><strong>{t('ranked')}.</strong>: {t('engage')}</li>
-              <li><strong>{t('favorites')}.</strong>: {t('easily')}</li>
-              <li><strong>{t('explore')}.</strong>: {t('increase')}</li>
+              <li><strong>{t('main_page')}</strong>: {t('forwhat')}.</li>
+              <li><strong>{t('ranked')}</strong>: {t('engage')}</li>
+              <li><strong>{t('favorites')}</strong>: {t('easily')}</li>
+              <li><strong>{t('explore')}</strong>: {t('increase')}</li>
             </ul>
           </p>
           <p className="py-4 text-left">
