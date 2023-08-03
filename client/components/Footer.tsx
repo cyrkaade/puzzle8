@@ -14,15 +14,6 @@ export default function Footer() {
         >
           cyrkaade{" "}
         </a>
-        in{" "}
-        <a
-          href="https://github.com/nfactorial-incubator"
-          target="_blank"
-          rel="noreferrer"
-          className="font-bold hover:underline transition underline-offset-2"
-        >
-          nFactorial Incubator
-        </a>
       </div>
       <div className="flex space-x-4 pb-4 sm:pb-0">
         <Link
