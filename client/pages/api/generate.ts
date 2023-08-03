@@ -37,6 +37,7 @@ const handler = async (req: Request): Promise<Response> => {
     stream, {
       headers: new Headers({
         'Cache-Control': 'no-cache',
+        'Content-Type': 'text/event-stream; charset=utf-8',
       })
     }
   );
