@@ -34,7 +34,7 @@ interface PuzzleItemProps {
 const PuzzleItem: React.FC<PuzzleItemProps> = ({ generatedpuzzle, currentUser, ptype }) => {
   const [isFavorited, setFavorited] = useState(false);
   const { t } = useTranslation('common');
-  const API_URL = 'https://sherlck-backend.onrender.com';
+  const API_URL = 'http://localhost:8000';
   return (
     <div
       className="bg-white rounded-xl shadow-md p-4 hover:bg-gray-100 transition cursor-copy border flex items-center"
@@ -43,11 +43,10 @@ const PuzzleItem: React.FC<PuzzleItemProps> = ({ generatedpuzzle, currentUser, p
         toast(`${t('copy')}`, { icon: "✂️" });
       }}
     >
-      {currentUser && (
       <div
-        className={`w-6 h-6 mr-4 text-amber-600
-        cursor-pointer transition duration-500 ease-in-out transform items-center ${isFavorited ? "scale-125" : ""}`}
+        className={`w-6 h-6 mr-4 text-amber-600 cursor-pointer transition duration-500 ease-in-out transform items-center ${isFavorited ? "scale-125" : ""}`}
         onClick={(e) => {
+          if (!currentUser) return;
           e.stopPropagation();
           setFavorited(!isFavorited);
           if (isFavorited) {
@@ -79,11 +78,12 @@ const PuzzleItem: React.FC<PuzzleItemProps> = ({ generatedpuzzle, currentUser, p
       >
         {isFavorited ? <FaHeart /> : <FaRegHeart />}
       </div>
-      )}
+      
       <p>{generatedpuzzle}</p>
     </div>
   );
 };
+
 
 const Home: NextPage<{locale: string}> = ({locale}) => { 
 

@@ -5,11 +5,16 @@ import prisma from "../../libs/prismadb"
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
-    const { username, email, password } = req.body;
+    let { username, email, password } = req.body;
 
-    if (!/^[a-z0-9]{4,16}$/.test(username)) {
+    username = username.trim();
+    email = email.trim();
+    password = password.trim();
+
+    if (!/^[a-zA-Z0-9]{4,16}$/.test(username)) {
       return res.status(400).json({ message: 'Username should be 4-16 characters long and contain only lowercase letters and numbers.' });
     }
+    
 
     const existingUsername = await prisma.user.findUnique({
       where: {
