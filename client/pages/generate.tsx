@@ -407,7 +407,7 @@ const updateUserData = async () => {
       }
     
       if (finalGeneratedAnswer.trim().toLowerCase() === 'correct') {
-        setAnswerMessage('Well done! Your answer is correct :)');
+        setAnswerMessage(t('correct_answer_message'));
         setDisableButton(true);
         setIsLastAnswerCorrect(true); 
       
@@ -416,7 +416,7 @@ const updateUserData = async () => {
       
         updateUserData();
       } else {
-        setAnswerMessage('Incorrect answer, try one more time');
+        setAnswerMessage(t('incorrect_answer_message'));
         setIsLastAnswerCorrect(false);
       }
       
@@ -503,28 +503,26 @@ const updateUserData = async () => {
         {t('home_title')}
         </h1>
 
-        <a className="text-slate-500 mt-5 cursor-pointer hover:underline" onClick={showModalStart}>First time using sherlck?</a>
+        <a className="text-slate-500 mt-5 cursor-pointer hover:underline" onClick={showModalStart}>{t('first_time')}</a>
         <dialog ref={modalRefStart} id="my_modal_5" className="modal modal-bottom sm:modal-middle" data-theme="light">
           <form method="dialog" className="modal-box">
-            <h3 className="font-bold text-lg">Welcome to sherlck.!</h3>
+            <h3 className="font-bold text-lg">{t('welcome')}</h3>
             <img src="logos.png"/>
-            <div className="py-4 text-left">
-  <p>
-    Welcome to <strong>sherlck</strong>! We're excited to have you explore our puzzle-loving community. Whether you're a puzzle enthusiast or a competitive solver, <strong>sherlck</strong> offers an extensive array of puzzles to generate, save, and solve.
-  </p>
-  <ul>
-    <li><strong>Main Page</strong>: For generating and saving your unique puzzles.</li>
-    <li><strong>Ranked</strong>: Engage in competitive puzzle solving and rank against other enthusiasts.</li>
-    <li><strong>Favorites</strong>: Easily find and manage your favorite puzzles.</li>
-  </ul>
-</div>
-<p className="py-4 text-left">
-  If you haven't registered yet, just head to the menu in the right-top corner and click “Create account.” Join us now - it's completely free!
-</p>
-
+            <p className="py-4 text-left">
+            {t('excited')}
+            <ul>
+              <li><strong>{t('main_page')}</strong>: {t('forwhat')}.</li>
+              <li><strong>{t('ranked')}</strong>: {t('engage')}</li>
+              <li><strong>{t('favorites')}</strong>: {t('easily')}</li>
+              <li><strong>{t('explore')}</strong>: {t('increase')}</li>
+            </ul>
+          </p>
+          <p className="py-4 text-left">
+          {t('calling')}
+          </p>
 
             <div className="modal-action">
-              <button className="btn">Close</button>
+              <button className="btn">{t('close')}</button>
             </div>
           </form>
         </dialog>
@@ -565,25 +563,25 @@ const updateUserData = async () => {
           <div>
           <dialog ref={modalRefTypes} id="my_modal_5" className="modal modal-bottom sm:modal-middle" data-theme="light">
   <form method="dialog" className="modal-box">
-    <h3 className="font-bold text-lg">Puzzle Types at sherlck</h3>
+    <h3 className="font-bold text-lg">{t('types_header')}</h3>
     <img src="puzzle.jpg" />
     <p className="py-4 text-left">
-      <strong>Riddle:</strong> A riddle is a statement or question with a double or hidden meaning that constitutes a puzzle to be solved. Often used in folklore or as brainteasers, riddles require creative thinking and the application of lateral thinking skills to figure out the answer.
+      <strong>{t('Puzzle')}:</strong>{t('riddle_description')}
     </p>
     <p className="py-4 text-left">
-      <strong>Logical Puzzle:</strong> Logical puzzles, also known as logic problems, require the solver to deduce the correct answer using deductive reasoning from a given set of statements. These puzzles are typically presented in the form of a story, and solvers must analyze the information, make logical inferences, and arrive at a solution that obeys all the given conditions.
+      <strong>{t('logical_puzzle')}:</strong> {t('logical_description')}
     </p>
     <p className="py-4 text-left">
-      <strong>Brainteaser:</strong> A brainteaser is a type of puzzle that requires non-traditional thinking, also known as "thinking outside the box." These puzzles often challenge the solver's ability to see underlying patterns or connections that are not immediately obvious, requiring creative problem-solving skills.
+      <strong>{t('Brainteaser')}:</strong> {t('brainteaser_description')}
     </p>
     <p className="py-4 text-left">
-      <strong>Anagram Puzzle:</strong> An anagram puzzle involves rearranging the letters of a word or phrase to produce a new word or phrase using all the original letters exactly once. Anagrams often require a strong understanding of language and vocabulary, as well as the ability to recognize potential patterns and combinations within the given letters.
+      <strong>{t('Anagram')}:</strong> {t('anagram_description')}
     </p>
     <p className="py-4 text-left">
-      <strong>Trivia Puzzle:</strong> Trivia puzzles test the solver's general knowledge on various subjects, including history, science, pop culture, and more. These puzzles are typically presented in the form of questions and can be multiple-choice or open-ended. Solving trivia puzzles requires a wide-ranging knowledge base and the ability to recall specific facts and information.
+      <strong>{t('Trivia')}:</strong> {t('trivia_description')}
     </p>
     <div className="modal-action">
-      <button className="btn">Close</button>
+      <button className="btn">{t('close')}</button>
     </div>
   </form>
 </dialog>
@@ -691,7 +689,7 @@ const updateUserData = async () => {
               </button>
             )}
               <div className={`mt-2 text-${userResult === 'Correct' ? 'green-500' : 'red-500'}`}>
-                {userResult === 'Correct' ? 'Well done! Your answer is correct :)' : userResult === 'Incorrect' ? 'Incorrect answer, try one more time' : ''}
+                {userResult === 'Correct' ? `${t('correct_answer_message')}` : userResult === 'Incorrect' ? `${t('incorrect_answer_message')}` : ''}
               </div>
               {
               isPuzzleGenerated && (

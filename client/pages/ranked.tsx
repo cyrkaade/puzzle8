@@ -504,7 +504,7 @@ useEffect(() => {
       }
     
       if (finalGeneratedAnswer.trim().toLowerCase() === 'correct') {
-        setAnswerMessage('Well done! Your answer is correct :)');
+        setAnswerMessage(t('correct_answer_message'));
         setDisableButton(true);
         setTimer(0);
         setTimerMessage(null);
@@ -522,7 +522,7 @@ useEffect(() => {
 
         updateUserData();
       } else {
-        setAnswerMessage('Incorrect answer, try one more time');
+        setAnswerMessage(t('incorrect_answer_message'));
         setIsLastAnswerCorrect(false);
       }
       
@@ -717,7 +717,7 @@ useEffect(() => {
               </button>
             )}
               <div className={`mt-2 text-${userResult === 'Correct' ? 'green-500' : 'red-500'}`}>
-                {userResult === 'Correct' ? 'Well done! Your answer is correct :)' : userResult === 'Incorrect' ? 'Incorrect answer, try one more time' : ''}
+                {userResult === 'Correct' ? `${t('correct_answer_message')}` : userResult === 'Incorrect' ? `${t('incorrect_answer_message')}` : ''}
               </div>
               {
               isPuzzleGenerated && (

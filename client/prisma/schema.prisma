@@ -23,6 +23,7 @@ model User {
   provider        String?
   solvedPuzzles   Int      @default(0)
   unsolvedPuzzles Int      @default(0)
+  rank            Int      @default(0)
 
   accounts Account[]
 }
