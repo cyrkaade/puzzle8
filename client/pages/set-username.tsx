@@ -51,7 +51,7 @@ export default function SetUsername() {
         if (response.ok) {
           const { user } = await response.json();
           Cookies.set('username', user.username);
-          router.push('/');
+          router.push('/home');
         }
          else {
           const { message } = await response.json();

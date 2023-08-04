@@ -26,6 +26,10 @@ const Home: NextPage = () => {
             if (data.user) {
               setCurrentUser(data.user);
               setUserPoints(data.user.rating);
+              if (data.user.username && data.user.username.startsWith('temp-')) {
+                router.push('/set-username');
+                return;
+              }
               fetch(`${API_URL}/users/ranking/${data.user.id}`)
                 .then((res) => res.json())
                 .then((data) => setUserRank(data.rank));
@@ -33,9 +37,6 @@ const Home: NextPage = () => {
             } else {
               router.push('/login');
             }
-            // if (!data.user.isUsernameSet) {
-            //   router.push('/set-username');
-            // }
           });
       }, []);
     
