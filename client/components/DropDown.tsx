@@ -12,14 +12,14 @@ function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
 }
 
-export type PuzzleType = "Riddle" | "Brainteaser" | "logic_puzzle" | "Trivia";
+export type PuzzleType = "Random" | "Brainteaser" | "logic_puzzle" | "Riddle";
 
 interface DropDownProps {
   ptype: PuzzleType;
   setType: (ptype: PuzzleType) => void;
 }
 
-let ptypes: PuzzleType[] = ["Riddle", "Brainteaser", "logic_puzzle", "Trivia"];
+let ptypes: PuzzleType[] = ["Random", "Brainteaser", "logic_puzzle", "Riddle"];
 
 export default function DropDown({ ptype, setType }: DropDownProps) {
   const { t } = useTranslation('common');

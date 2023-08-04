@@ -1,27 +1,34 @@
-import type { NextPage, GetServerSideProps } from "next";
+import type { NextPage, GetServerSideProps, GetStaticProps } from "next";
+import Head from "next/head";
+import Image from "next/image";
 import { useRef, useState, useEffect } from "react";
 import { Toaster, toast } from "react-hot-toast";
-import Footer from "../components/Footer";
-import Header from "../components/navbar/Header";
-import LoadingDots from "../components/LoadingDots";
+import DropDown, { PuzzleType } from "../DropDown";
+import Footer from "../Footer";
+import Header from "../navbar/Header";
+import LoadingDots from "../LoadingDots";
 import {
   createParser,
   ParsedEvent,
   ReconnectInterval,
 } from "eventsource-parser";
-import RegisterModal from "../components/RegisterModal";
-import LoginModal from "../components/LoginModal";
+import RegisterModal from "../RegisterModal";
+import LoginModal from "../LoginModal";
 import { FaRegHeart, FaHeart } from 'react-icons/fa';
 import Cookies from 'js-cookie';
+import axios from 'axios';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import { Textarea } from "../@/components/ui/textarea";
+import { Textarea } from "../../@/components/ui/textarea";
+import withUsername from "../../actions/withUsername";
+import { getSessionNow } from "../../actions/getCurrentUser";
 import { getSession } from "next-auth/react";
 import { useRouter } from "next/router";
-import Head from "next/head";
+
+// import withUsername from "../actions/withUsername";
 
 
-const API_URL = process.env.API_URL;
+const API_URL = 'http://localhost:8000';
 
 interface PuzzleItemProps {
     generatedpuzzle: string;
@@ -80,7 +87,7 @@ interface PuzzleItemProps {
     );
   };
 
-const Ranked: NextPage<{locale: string}> = ({locale}) => { 
+  export default function TestRanked() {
 
     const [loadingGenerate, setLoadingGenerate] = useState(false);
     const [loadingSubmit, setLoadingSubmit] = useState(false);
@@ -101,15 +108,14 @@ const Ranked: NextPage<{locale: string}> = ({locale}) => {
     const [showAnswer, setShowAnswer] = useState(false);
     const [gameOver, setGameOver] = useState(false);
     const [ratingMessage, setRatingMessage] = useState<string | null>(null);
-    const [solvedPuzzles, setSolvedPuzzles] = useState(0);
     const [userRank, setUserRank] = useState(0);
     const [imageURL, setImageURL] = useState('');
     const [isLastAnswerCorrect, setIsLastAnswerCorrect] = useState<boolean>(false);
     const [correctAnswer, setCorrectAnswer] = useState<String>("");
     const puzzleTypes = ["Lateral Thinking Problem", "Logic Puzzle", "Mathematical Riddle", "Detective Riddle", "Coded Message", "Anagram Puzzle", "Trivia Puzzle"];
-    const userId = currentUser ? currentUser.id : null;
 
     const router = useRouter();
+    const { locale } = router
 
 
     
@@ -128,25 +134,10 @@ const Ranked: NextPage<{locale: string}> = ({locale}) => {
     const handleShowAnswer = async () => {
       setShowAnswer(true);
       generateAnswer();
-      
-      if (!isLastAnswerCorrect) {
-      await fetch("/api/rateDown", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          userId: currentUser.id,
-        }),
-      });
-    }
     
       setTimer(0);
       setDisableButton(true);
       setGameOver(true);
-    
-
-      updateUserData();
     };
 
     
@@ -158,15 +149,6 @@ const Ranked: NextPage<{locale: string}> = ({locale}) => {
       } else if (timer === 0 && isPuzzleGenerated && !answerMessage && !gameOver) {
         setDisableButton(true);
         setTimerMessage("Time went out");
-        fetch("/api/rateDown", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            userId: currentUser.id,
-          }),
-        });
 
       }
     
@@ -179,35 +161,7 @@ const Ranked: NextPage<{locale: string}> = ({locale}) => {
 
     
     
-    
-    const updateUserRank = async () => {
-      if (currentUser) {
-        const response = await fetch(`${API_URL}/users/ranking/${currentUser.id}`);
-        const data = await response.json();
-        setUserRank(data.rank);
-      }
-    };
 
-
-    useEffect(() => {
-      fetch('/api/currentUser')
-        .then((res) => res.json())
-        .then((data) => {
-          if (data.user) {
-            setCurrentUser(data.user);
-            setUserPoints(data.user.rating);
-            fetch(`${API_URL}/users/ranking/${data.user.id}`)
-              .then((res) => res.json())
-              .then((data) => setUserRank(data.rank));
-            Cookies.remove('generationCount');
-          } else {
-            router.push('/login');
-          }
-          // if (!data.user.isUsernameSet) {
-          //   router.push('/set-username');
-          // }
-        });
-    }, []);
     
 
     const handleNext = (e: any) => {
@@ -219,51 +173,6 @@ const Ranked: NextPage<{locale: string}> = ({locale}) => {
       generatePuzzle(e);
     }
 
-const updateUserData = async () => {
-  const res = await fetch('/api/currentUser');
-  const data = await res.json();
-  if (data.user) {
-    let oldRating = userPoints;
-    let newRating = data.user.rating;
-    setCurrentUser(data.user);
-    setUserPoints(newRating);
-        
-    let difference = newRating - oldRating;
-    if (difference > 0) {
-      toast.success(`Rating +${difference}`);
-    } else if (difference < 0) {
-      toast.error(`Rating ${difference}`);
-    }
-
-    updateUserRank();
-  } else {
-    console.error(data.error);
-  }
-};
-
-const handleUnload = async (e: BeforeUnloadEvent) => {
-  if (timer > 0 && isPuzzleGenerated && !gameOver) {
-    e.preventDefault();
-    await fetch("/api/rateDown", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        userId: currentUser.id,
-      }),
-    });
-    updateUserData();
-  }
-};
-
-useEffect(() => {
-  window.addEventListener("beforeunload", handleUnload);
-
-  return () => {
-    window.removeEventListener("beforeunload", handleUnload);
-  };
-}, [timer, isPuzzleGenerated, gameOver, currentUser]);
 
 
 
@@ -274,26 +183,14 @@ useEffect(() => {
         return;
       }
     
-      await fetch("/api/rateDown", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          userId: currentUser.id,
-        }),
-      });
-    
       setAnswer("");
       setAnswerMessage(null);
       setShowAnswer(false);
       setGeneratedAnswers("");
       generatePuzzle(e);
-      setTimer(150);
+      setTimer(300);
       setGameOver(true);
     
-
-      updateUserData();
     };
     
 
@@ -301,9 +198,7 @@ useEffect(() => {
   
     
     const scrollToPuzzles = () => {
-      if (puzzleRef.current !== null) {
-        puzzleRef.current.scrollIntoView({ behavior: "smooth" });
-      }
+
     };
     
     if (userPoints < 700)
@@ -353,7 +248,7 @@ useEffect(() => {
       setLoadingGenerate(true);
       if (!currentUser) {
         const generationCount = Cookies.get('generationCount') ? parseInt(Cookies.get('generationCount') as string) : 0;
-        if (generationCount >= 2) {
+        if (generationCount >= 7) {
           setLoadingGenerate(true);(false);
           toast("I'm sorry, it seems like you've already used up all your generations. To get unlimited generations, please sign up.");
           return;
@@ -369,7 +264,7 @@ useEffect(() => {
           prompt,
         }),
       })
-      setTimer(150);
+      setTimer(300);
       setDisableButton(false);
       setTimerMessage("");
       
@@ -450,7 +345,7 @@ useEffect(() => {
       setLoadingSubmit(true);
       if (!currentUser) {
         const generationCount = Cookies.get('generationCount') ? parseInt(Cookies.get('generationCount') as string) : 0;
-        if (generationCount >= 2) {
+        if (generationCount >= 7) {
           setLoadingSubmit(false);
           toast("I'm sorry, it seems like you've already used up all your generations. To get unlimited generations, please sign up.");
           return;
@@ -510,17 +405,7 @@ useEffect(() => {
         setTimerMessage(null);
         setIsLastAnswerCorrect(true); 
       
-        await fetch("/api/rateUp", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            userId: currentUser.id,
-          }),
-        });
 
-        updateUserData();
       } else {
         setAnswerMessage('Incorrect answer, try one more time');
         setIsLastAnswerCorrect(false);
@@ -595,16 +480,7 @@ useEffect(() => {
         </Head>
         <RegisterModal/>
         <LoginModal/>
-        <Header currentUser={currentUser}/>
-        
         <main className="flex flex-1 w-full flex-col items-center justify-center text-center px-4 mt-12 sm:mt-20">
-
-        <button
-    onClick={() => router.push('/home')}
-    className="text-white bg-yellow-600 hover:bg-yellow-700 py-2 px-4 rounded-lg mb-4 cursor-pointer"
-  >
-    {t('return')}
-  </button>
 
         <div className="flex justify-end items-center mr-4">
         {t('rating')} {userPoints} | {t('rank')} #{userRank} | {t('timer')} {timer} {t('secs_left')}
@@ -771,33 +647,6 @@ useEffect(() => {
           />
           <hr className="h-px bg-gray-700 border-1 dark:bg-gray-700" />
         </main>
-        <Footer />
       </div>
     );
   };
-
-
-  export const getServerSideProps: GetServerSideProps = async (context) => {
-    const { req, locale } = context;
-  
-    const session = await getSession({ req });
-  
-    // if (!session) {
-    //   return {
-    //     redirect: {
-    //       destination: '/?loginRequired=true',
-    //       permanent: false,
-    //     },
-    //   }
-    // }
-  
-    return {
-      props: {
-        ...(await serverSideTranslations(locale as string, ['common'])),
-        locale, 
-      },
-    };
-  }
-
-  
-  export default Ranked;

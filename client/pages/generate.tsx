@@ -1,6 +1,10 @@
-import type { NextPage, GetServerSideProps } from "next";
+import DiscreteSliderLabel from "../components/Slider";
+import type { NextPage, GetServerSideProps, GetStaticProps } from "next";
+import Head from "next/head";
+import Image from "next/image";
 import { useRef, useState, useEffect } from "react";
 import { Toaster, toast } from "react-hot-toast";
+import DropDown, { PuzzleType } from "../components/DropDown";
 import Footer from "../components/Footer";
 import Header from "../components/navbar/Header";
 import LoadingDots from "../components/LoadingDots";
@@ -18,7 +22,6 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { Textarea } from "../@/components/ui/textarea";
 import { getSession } from "next-auth/react";
 import { useRouter } from "next/router";
-import Head from "next/head";
 
 
 const API_URL = process.env.API_URL;
@@ -80,68 +83,70 @@ interface PuzzleItemProps {
     );
   };
 
-const Ranked: NextPage<{locale: string}> = ({locale}) => { 
+const Generate: NextPage<{locale: string}> = ({locale}) => { 
+
+  const [loading, setLoading] = useState(false);
+  const [style, setStyle] = useState("");
+  const [ptype, setType] = useState<PuzzleType>("Random");
+  const [difficulty, setDifficulty] = useState<number>(80);
+  const [generatedPuzzles, setGeneratedPuzzles] = useState<String>("");
+
+  const puzzleRef = useRef<null | HTMLDivElement>(null);
+  const [currentUser, setCurrentUser] = useState(null);
+  const { t,i18n } = useTranslation('common');
+
+  const modalRefStart = useRef<any>(null);
+  const modalRefTypes = useRef<any>(null);
+  
+
+  const showModalStart = () => {
+    modalRefStart.current.showModal();
+  };
+  
+  const showModalTypes = () => {
+    modalRefTypes.current.showModal();
+  };
 
     const [loadingGenerate, setLoadingGenerate] = useState(false);
     const [loadingSubmit, setLoadingSubmit] = useState(false);
     const [answer, setAnswer] = useState("");
-    let [difficulty, setDifficulty] = useState<string>("");
-    const [generatedPuzzles, setGeneratedPuzzles] = useState<string>("");
     const [generatedAnswers, setGeneratedAnswers] = useState<String>("");
     const [isError, setIsError] = useState(false);
-    const puzzleRef = useRef<null | HTMLDivElement>(null);
-    const [currentUser, setCurrentUser] = useState<any | null>(null);
     const [isPuzzleGenerated, setIsPuzzleGenerated] = useState(false);
-    const [userPoints, setUserPoints] = useState(0);
     const [userResult, setUserResult] = useState<string>("");
     const [answerMessage, setAnswerMessage] = useState<string | null>(null);
-    const [timer, setTimer] = useState<number>(0);
     const [disableButton, setDisableButton] = useState<boolean>(false);
-    const [timerMessage, setTimerMessage] = useState<string | null>(null);
     const [showAnswer, setShowAnswer] = useState(false);
     const [gameOver, setGameOver] = useState(false);
-    const [ratingMessage, setRatingMessage] = useState<string | null>(null);
-    const [solvedPuzzles, setSolvedPuzzles] = useState(0);
-    const [userRank, setUserRank] = useState(0);
     const [imageURL, setImageURL] = useState('');
     const [isLastAnswerCorrect, setIsLastAnswerCorrect] = useState<boolean>(false);
     const [correctAnswer, setCorrectAnswer] = useState<String>("");
     const puzzleTypes = ["Lateral Thinking Problem", "Logic Puzzle", "Mathematical Riddle", "Detective Riddle", "Coded Message", "Anagram Puzzle", "Trivia Puzzle"];
+    //@ts-ignore
     const userId = currentUser ? currentUser.id : null;
 
     const router = useRouter();
 
-
-    
-    
-
-
-    const { t } = useTranslation('common');
+    useEffect(() => {
+      if (i18n.isInitialized) {
+        setType(t('Random') as PuzzleType); 
+      }
+    }, [i18n.isInitialized, t]);
+  
 
     useEffect(() => {
       if(isPuzzleGenerated) {
+        //@ts-ignore
         generateImage(generatedPuzzles);
       }
     }, [isPuzzleGenerated]);
+
     
      
     const handleShowAnswer = async () => {
       setShowAnswer(true);
       generateAnswer();
-      
-      if (!isLastAnswerCorrect) {
-      await fetch("/api/rateDown", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          userId: currentUser.id,
-        }),
-      });
-    }
-    
-      setTimer(0);
+
       setDisableButton(true);
       setGameOver(true);
     
@@ -149,44 +154,7 @@ const Ranked: NextPage<{locale: string}> = ({locale}) => {
       updateUserData();
     };
 
-    
-    useEffect(() => {
-      let timerId: NodeJS.Timeout | null = null;
-    
-      if (timer > 0) {
-        timerId = setTimeout(() => setTimer(timer - 1), 1000);
-      } else if (timer === 0 && isPuzzleGenerated && !answerMessage && !gameOver) {
-        setDisableButton(true);
-        setTimerMessage("Time went out");
-        fetch("/api/rateDown", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            userId: currentUser.id,
-          }),
-        });
 
-      }
-    
-      return () => {
-        if (timerId) {
-          clearTimeout(timerId);
-        }
-      };
-    }, [timer, isPuzzleGenerated, answerMessage, gameOver]);
-
-    
-    
-    
-    const updateUserRank = async () => {
-      if (currentUser) {
-        const response = await fetch(`${API_URL}/users/ranking/${currentUser.id}`);
-        const data = await response.json();
-        setUserRank(data.rank);
-      }
-    };
 
 
     useEffect(() => {
@@ -195,17 +163,13 @@ const Ranked: NextPage<{locale: string}> = ({locale}) => {
         .then((data) => {
           if (data.user) {
             setCurrentUser(data.user);
-            setUserPoints(data.user.rating);
             fetch(`${API_URL}/users/ranking/${data.user.id}`)
               .then((res) => res.json())
-              .then((data) => setUserRank(data.rank));
             Cookies.remove('generationCount');
           } else {
             router.push('/login');
           }
-          // if (!data.user.isUsernameSet) {
-          //   router.push('/set-username');
-          // }
+
         });
     }, []);
     
@@ -223,104 +187,22 @@ const updateUserData = async () => {
   const res = await fetch('/api/currentUser');
   const data = await res.json();
   if (data.user) {
-    let oldRating = userPoints;
-    let newRating = data.user.rating;
     setCurrentUser(data.user);
-    setUserPoints(newRating);
-        
-    let difference = newRating - oldRating;
-    if (difference > 0) {
-      toast.success(`Rating +${difference}`);
-    } else if (difference < 0) {
-      toast.error(`Rating ${difference}`);
-    }
-
-    updateUserRank();
   } else {
     console.error(data.error);
   }
 };
 
-const handleUnload = async (e: BeforeUnloadEvent) => {
-  if (timer > 0 && isPuzzleGenerated && !gameOver) {
-    e.preventDefault();
-    await fetch("/api/rateDown", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        userId: currentUser.id,
-      }),
-    });
-    updateUserData();
-  }
-};
-
-useEffect(() => {
-  window.addEventListener("beforeunload", handleUnload);
-
-  return () => {
-    window.removeEventListener("beforeunload", handleUnload);
-  };
-}, [timer, isPuzzleGenerated, gameOver, currentUser]);
-
-
-
-    const handleSkip = async (e: any) => {
-      e.preventDefault();
-    
-      if(disableButton) {
-        return;
-      }
-    
-      await fetch("/api/rateDown", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          userId: currentUser.id,
-        }),
-      });
-    
-      setAnswer("");
-      setAnswerMessage(null);
-      setShowAnswer(false);
-      setGeneratedAnswers("");
-      generatePuzzle(e);
-      setTimer(150);
-      setGameOver(true);
-    
-
-      updateUserData();
-    };
-    
-
-    
-  
     
     const scrollToPuzzles = () => {
       if (puzzleRef.current !== null) {
         puzzleRef.current.scrollIntoView({ behavior: "smooth" });
       }
     };
-    
-    if (userPoints < 700)
-      difficulty = "very easy";
-    else if (userPoints < 1100)
-        difficulty = "easy"
-    else if (userPoints < 1900)
-        difficulty = "medium"
-    else if (userPoints < 2300)
-        difficulty = "hard"
-    else if (userPoints >= 2300)
-        difficulty = "very hard"
 
 
     const generatePuzzle = async (e: any) => {
       setIsPuzzleGenerated(false);
-      setTimerMessage(null);
       setAnswerMessage(null);
       setGeneratedAnswers("");
       e.preventDefault();
@@ -331,23 +213,23 @@ useEffect(() => {
 
       let prompt: string
       if (locale === 'ru'){ 
-        prompt = `Как продвинутый ИИ, создайте уникальную головоломку специально для пользователя со сложностью ${difficulty}. Эта головоломка должна быть:
+        prompt = `Как продвинутый ИИ, создайте уникальную головоломку специально для пользователя со сложностью ${difficulty}/100, типом ${ptype} и стилем ${style}. Эта головоломка должна быть:
 
         1. Инновационной и необычной, не включающей в себя клишированных тем, таких как "два стража и дилемма ложь/правда".
         2. Соответствующей указанному уровню сложности, привлекая интерес пользователя, не будучи слишком простой или чрезмерно сложной.
-        3. Состоять из 80 до 180 слов, представляя собой краткое задание.
+        3. Состоять из 80 до 160 слов, представляя собой краткое задание.
         
-        Для этого запроса создайте головоломку, которая относится к категории ${puzzle_type}. Это может быть задача на сообразительность, математическая головоломка, тайная загадка, задание на невербальное мышление, детективный сценарий или любая другая умственно стимулирующая задача, требующая латерального мышления. Избегайте явных решений в самом тексте головоломки и выведите только текст головоломки.`;        
+        Для этого запроса создайте головоломку, которая относится к категории ${ptype}. Это может быть задача на сообразительность, математическая головоломка, тайная загадка, задание на невербальное мышление, детективный сценарий или любая другая умственно стимулирующая задача, требующая латерального мышления. Избегайте явных решений в самом тексте головоломки и выведите только текст головоломки.`;        
       }
 
       else {
-        prompt = `As an advanced AI, create a unique puzzle specifically for a user with a difficulty level of ${difficulty}. This puzzle should be:
+        prompt = `As an advanced AI, create a unique puzzle specifically for a user with a difficulty level of ${difficulty}/100, with type ${ptype} and style ${style}. This puzzle should be:
 
         1. Innovative and uncommon, not involving clichéd themes like 'two guards and a lie/truth dilemma'.
         2. Appropriate for the specified difficulty level, engaging the user's interest without being overly simple or excessively complex.
-        3. Comprised of 80 to 180 words, offering a concise challenge.
+        3. Comprised of 80 to 160 words, offering a concise challenge.
         
-        For this request, generate a puzzle that falls under the category of ${puzzle_type}. This could be a brainteaser, mathematical conundrum, cryptic riddle, non-verbal reasoning challenge, detective scenario, or any other mentally stimulating task requiring lateral thinking. Avoid explicit solutions within the puzzle text itself.`;
+        For this request, generate a puzzle that falls under the category of ${ptype}. This could be a brainteaser, mathematical conundrum, cryptic riddle, non-verbal reasoning challenge, detective scenario, or any other mentally stimulating task requiring lateral thinking. Avoid explicit solutions within the puzzle text itself.`;
         
       }
       setLoadingGenerate(true);
@@ -369,9 +251,7 @@ useEffect(() => {
           prompt,
         }),
       })
-      setTimer(150);
       setDisableButton(false);
-      setTimerMessage("");
       
   
       if (!response.ok) {
@@ -395,8 +275,6 @@ useEffect(() => {
           }
         }
       }
-      // setGeneratedPuzzles(generatedPuzzle);
-      // generateImage(generatedPuzzle);
 
       
       const reader = data.getReader();
@@ -413,6 +291,31 @@ useEffect(() => {
       scrollToPuzzles();
       setLoadingGenerate(false);
     };
+
+    const incrementSolvedPuzzles = async () => {
+      try {
+        const res = await fetch("/api/updateSolvedPuzzles", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            userId: userId,
+          }),
+        });
+    
+        if (!res.ok) {
+          throw new Error('Failed to update solved puzzles');
+        }
+    
+
+        updateUserData();
+    
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    
 
     const generateImage = async (generatedPuzzles: string) => {
       const imageRes = await fetch(`${API_URL}/generateImage`, {
@@ -506,20 +409,11 @@ useEffect(() => {
       if (finalGeneratedAnswer.trim().toLowerCase() === 'correct') {
         setAnswerMessage('Well done! Your answer is correct :)');
         setDisableButton(true);
-        setTimer(0);
-        setTimerMessage(null);
         setIsLastAnswerCorrect(true); 
       
-        await fetch("/api/rateUp", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            userId: currentUser.id,
-          }),
-        });
 
+        incrementSolvedPuzzles();
+      
         updateUserData();
       } else {
         setAnswerMessage('Incorrect answer, try one more time');
@@ -596,27 +490,112 @@ useEffect(() => {
         <RegisterModal/>
         <LoginModal/>
         <Header currentUser={currentUser}/>
-        
         <main className="flex flex-1 w-full flex-col items-center justify-center text-center px-4 mt-12 sm:mt-20">
-
-        <button
+          
+          <div className="max-w-xl w-full">
+          <button
     onClick={() => router.push('/home')}
     className="text-white bg-yellow-600 hover:bg-yellow-700 py-2 px-4 rounded-lg mb-4 cursor-pointer"
   >
     {t('return')}
   </button>
+          <h1 className="sm:text-6xl text-4xl max-w-[708px] font-bold text-slate-900">
+        {t('home_title')}
+        </h1>
 
-        <div className="flex justify-end items-center mr-4">
-        {t('rating')} {userPoints} | {t('rank')} #{userRank} | {t('timer')} {timer} {t('secs_left')}
+        <a className="text-slate-500 mt-5 cursor-pointer hover:underline" onClick={showModalStart}>First time using sherlck?</a>
+        <dialog ref={modalRefStart} id="my_modal_5" className="modal modal-bottom sm:modal-middle" data-theme="light">
+          <form method="dialog" className="modal-box">
+            <h3 className="font-bold text-lg">Welcome to sherlck.!</h3>
+            <img src="logos.png"/>
+            <div className="py-4 text-left">
+  <p>
+    Welcome to <strong>sherlck</strong>! We're excited to have you explore our puzzle-loving community. Whether you're a puzzle enthusiast or a competitive solver, <strong>sherlck</strong> offers an extensive array of puzzles to generate, save, and solve.
+  </p>
+  <ul>
+    <li><strong>Main Page</strong>: For generating and saving your unique puzzles.</li>
+    <li><strong>Ranked</strong>: Engage in competitive puzzle solving and rank against other enthusiasts.</li>
+    <li><strong>Favorites</strong>: Easily find and manage your favorite puzzles.</li>
+  </ul>
+</div>
+<p className="py-4 text-left">
+  If you haven't registered yet, just head to the menu in the right-top corner and click “Create account.” Join us now - it's completely free!
+</p>
+
+
+            <div className="modal-action">
+              <button className="btn">Close</button>
+            </div>
+          </form>
+        </dialog>
+        <div className="max-w-xl w-full">
+          <div className="flex mt-10 items-center space-x-3">
+            <Image
+              src="/number-one.png"
+              width={30}
+              height={30}
+              alt="1 icon"
+              className="mb-5 sm:mb-0"
+            />
+            <p className="text-left font-medium">
+            {t('style')}
+              <span className="text-slate-500">
+                {t('graystyle')}
+              </span>
+            </p>
+          </div>
+          <Textarea value={style}
+            onChange={(e) => setStyle(e.target.value)}
+            rows={4}
+            className="w-full rounded-md border-gray-300 shadow-sm focus:border-black focus:ring-black my-5"
+            placeholder={
+              `${t('egstyle')}`
+            }/>
+
+          <div className="flex mb-5 items-center space-x-3">
+            <Image src="/number-two.png" width={30} height={30} alt="1 icon" />
+            <p className="text-left font-medium">{t('type')}</p>
+            <div onClick={showModalTypes} className="cursor-pointer">
+            <Image src="/info.png" width={20} height={20} alt="Tooltip Icon" />
+          </div>
+          </div>
+          <div className="block">
+            <DropDown ptype={ptype} setType={(newType) => setType(newType)} />
+          </div>
+          <div>
+          <dialog ref={modalRefTypes} id="my_modal_5" className="modal modal-bottom sm:modal-middle" data-theme="light">
+  <form method="dialog" className="modal-box">
+    <h3 className="font-bold text-lg">Puzzle Types at sherlck</h3>
+    <img src="puzzle.jpg" />
+    <p className="py-4 text-left">
+      <strong>Riddle:</strong> A riddle is a statement or question with a double or hidden meaning that constitutes a puzzle to be solved. Often used in folklore or as brainteasers, riddles require creative thinking and the application of lateral thinking skills to figure out the answer.
+    </p>
+    <p className="py-4 text-left">
+      <strong>Logical Puzzle:</strong> Logical puzzles, also known as logic problems, require the solver to deduce the correct answer using deductive reasoning from a given set of statements. These puzzles are typically presented in the form of a story, and solvers must analyze the information, make logical inferences, and arrive at a solution that obeys all the given conditions.
+    </p>
+    <p className="py-4 text-left">
+      <strong>Brainteaser:</strong> A brainteaser is a type of puzzle that requires non-traditional thinking, also known as "thinking outside the box." These puzzles often challenge the solver's ability to see underlying patterns or connections that are not immediately obvious, requiring creative problem-solving skills.
+    </p>
+    <p className="py-4 text-left">
+      <strong>Anagram Puzzle:</strong> An anagram puzzle involves rearranging the letters of a word or phrase to produce a new word or phrase using all the original letters exactly once. Anagrams often require a strong understanding of language and vocabulary, as well as the ability to recognize potential patterns and combinations within the given letters.
+    </p>
+    <p className="py-4 text-left">
+      <strong>Trivia Puzzle:</strong> Trivia puzzles test the solver's general knowledge on various subjects, including history, science, pop culture, and more. These puzzles are typically presented in the form of questions and can be multiple-choice or open-ended. Solving trivia puzzles requires a wide-ranging knowledge base and the ability to recall specific facts and information.
+    </p>
+    <div className="modal-action">
+      <button className="btn">Close</button>
+    </div>
+  </form>
+</dialog>
+
         </div>
 
-          <h1 className="sm:text-6xl text-4xl max-w-[708px] font-bold text-slate-900">
-          {t('ranked_game')}
-          </h1>
-
-          <p className="text-slate-500 mt-5">{t('deductive_abilities')}</p>
-  
-          <div className="max-w-xl w-full">
+          <div className="flex items-center space-x-3 mt-5">
+            <Image src="/number-three.png" width={30} height={30} alt="1 icon" />
+            <p className="text-left font-medium">{t('difficulty')}</p>
+          </div>
+          <DiscreteSliderLabel onChange={setDifficulty} />
+          </div>
   
           {!loadingGenerate && !isPuzzleGenerated && (
             <button
@@ -651,7 +630,7 @@ useEffect(() => {
                     {generatedPuzzles
                     .split("^^^.")
                     .map((generatedpuzzle, index) => (
-                      <PuzzleItem generatedpuzzle={generatedpuzzle} key={index} currentUser={currentUser} ptype="Competitive puzzle" />
+                      <PuzzleItem generatedpuzzle={generatedpuzzle} key={index} currentUser={currentUser} ptype={ptype} />
                     ))}
                      
                     <img src={imageURL}></img>
@@ -702,11 +681,6 @@ useEffect(() => {
                 {answerMessage}
               </div>
             )}
-            {timerMessage && (
-              <div className="mt-2 text-red-500">
-                {timerMessage}
-              </div>
-            )}
 
             {loadingSubmit && (
               <button
@@ -724,28 +698,21 @@ useEffect(() => {
                 <div className="flex flex-col items-center mt-4 pt-8">
 
                   <div className="flex justify-center space-x-4">
-                    <button
-                      className={`bg-black rounded-xl text-white font-medium px-4 py-2 hover:bg-black/80 ${!isPuzzleGenerated || disableButton || timer <= 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
-                      onClick={(e) => handleSkip(e)}
-                      disabled={!isPuzzleGenerated || disableButton || timer <= 0}
-                    >
-                      {t('skip')}
-                    </button>
                     <div>
                     <button
                       className={`bg-black rounded-xl text-white font-medium px-4 py-2 hover:bg-black/80 ${
-                        !isPuzzleGenerated || (answerMessage === `${t('incorrect_answer_message')}` && !timerMessage) || (timer > 0 && !timerMessage)
+                        !isPuzzleGenerated || (answerMessage === `${t('incorrect_answer_message')}`)
                           ? "opacity-50 cursor-not-allowed"
                           : ""
                       }`}
                       onClick={(e) => handleNext(e)}
                       disabled={
-                        !isPuzzleGenerated || (answerMessage === `${t('incorrect_answer_message')}` && !timerMessage) || (timer > 0 && !timerMessage)
+                        !isPuzzleGenerated || (answerMessage === `${t('incorrect_answer_message')}`)
                       }
                     >
                       {t('next')}
                     </button>
-                    {ratingMessage && <span>{ratingMessage}</span>}
+                  
                     </div>
                   </div>
                   <a
@@ -800,4 +767,4 @@ useEffect(() => {
   }
 
   
-  export default Ranked;
+  export default Generate;

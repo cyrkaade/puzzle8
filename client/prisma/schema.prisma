@@ -21,6 +21,8 @@ model User {
   favoriteIds     String[] @db.ObjectId
   isUsernameSet   Boolean  @default(false)
   provider        String?
+  solvedPuzzles   Int      @default(0)
+  unsolvedPuzzles Int      @default(0)
 
   accounts Account[]
 }

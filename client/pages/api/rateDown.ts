@@ -10,10 +10,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   
   const rateDown = Math.floor(Math.random() * (27 - 13 + 1)) + 13;
   const newRating = user.rating - rateDown;
+  const newUnsolvedPuzzles = user.unsolvedPuzzles + 1;
 
   const updatedUser = await prisma.user.update({
     where: { id: userId },
-    data: { rating: newRating },
+    data: { rating: newRating, unsolvedPuzzles: newUnsolvedPuzzles },
   });
 
   res.status(200).json({ user: { ...updatedUser, password: undefined } }); 

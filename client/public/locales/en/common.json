@@ -98,7 +98,73 @@
     "forwhat":"For generating and saving your unique puzzles.",
     "excited":"We're excited to have you explore our puzzle-loving community. Whether you're a puzzle enthusiast or a competitive solver, sherlck offers an extensive array of puzzles to generate, save, and solve.",
 
-    "main_page": "Main page"
+    "main_page": "Main page",
+
+    "tryout": "Try out our functions",
+    "readytotry":"Are you ready to test your intellectual abilities?",
+    "dontlet":"Don't let your brain become weak",
+    "signuprightnow":"Sign up now",
+    "ongithub": "View on Github",
+    "theplace":"Sherlck is the place where you can improve your intellectual and critical thinking abilities by solving and generating puzzles!",
+    "bestplace":"Best puzzle-solving place",
+
+    "benefitOne": {
+        "title": "Generate unlimited amount of puzzles",
+        "desc": "You can generate unique puzzles based on your interests and tastes.",
+        "bullets": {
+          "haveFun": {
+            "title": "Have fun",
+            "desc": "You can call your friends and try to solve challenging puzzles together."
+          },
+          "improveThinking": {
+            "title": "Improve critical-thinking skills",
+            "desc": "Puzzles can increase your ability to think faster and make correct decisions."
+          },
+          "easyToUse": {
+            "title": "Easy to use",
+            "desc": "Dashboard, generate and ranked pages - all you need here."
+          }
+        }
+      },
+    "benefitTwo": {
+        "title": "Compete with other users in the world",
+        "desc": "Solve the puzzles in real time, get the right answer and raise your rating in the application. Check your answers until the timer stops.",
+        "bullets": {
+          "mobileResponsive": {
+            "title": "Mobile Responsive Application",
+            "desc": "Sherlck is designed as a mobile first responsive web app."
+          },
+          "poweredByAI": {
+            "title": "Powered by AI",
+            "desc": "This application is powered by latest technologies and tools, so you don't need to worry about puzzles' creativeness and uniqueness."
+          },
+          "makeFutureBrighter": {
+            "title": "Make your future brighter.",
+            "desc": "By solving puzzles you can increase your intelligence and after time your sharp mind will help you anyway."
+          }
+        }
+      },
+  "joining": "Get started",
+
+  "welcomeBack": "Welcome back",
+  "yourCurrentRating": "Your current rating",
+  "solvedPuzzles": "Solved puzzles",
+  "numberOfPuzzlesYouHaveSolved": "Number of puzzles you have solved",
+  "yourRankAmongAllUsers": "Your rank among all users",
+  "suRatio": "S/U",
+  "solvePuzzles": "Solve interesting puzzles",
+  "playRanked": "Play against other players",
+  "yourFavorites": "View your favorite puzzles",
+
+"solveInterestingPuzzles": "Solve an unlimited number of puzzles for every taste!",
+"playAgainstOtherPlayers": "Challenge yourself with difficult puzzles, competing against players from all over the world!",
+"viewYourFavoritePuzzles": "View your favorite puzzles.",
+"yourSuccessFailureRatio": "Ratio of solved / unsolved puzzles.",
+"playnow": "Play now",
+"look": "Look",
+"generate": "Generate",
+"return": "Back to home page",
+"Random": "Random"
 
 
   }

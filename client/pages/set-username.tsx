@@ -35,7 +35,7 @@ export default function SetUsername() {
     if (session) {
       const user = session.user as User;
   
-      if (!/^[a-z0-9]{4,16}$/.test(username)) {
+      if (!/^[a-zA-Z0-9]{4,16}$/.test(username)) {
         setMessage(`${t('warning')}`);
         return;
       }

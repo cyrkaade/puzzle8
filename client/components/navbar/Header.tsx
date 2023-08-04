@@ -19,7 +19,7 @@ const Header: React.FC<HeaderProps> = ({
 
   return (
     <header className="flex justify-between items-center w-full mt-5 border-b-2 pb-4 sm:px-4 px-2">
-      <Link href="/" className="flex space-x-3 -ml-2">
+      <Link href="/home" className="flex space-x-3 -ml-2">
         <img
           alt="header text"
           src="/reallogo.png"
@@ -33,7 +33,7 @@ const Header: React.FC<HeaderProps> = ({
       </Link>
   
       <div className="md:flex hidden mr-12 space-x-6">
-        <Link href="/explore" className="hover:underline">{t('explore')}</Link>
+        <Link href="/generate" className="hover:underline">{t('generate')}</Link>
         <Link href="/ranked" className="hover:underline">{t('ranked')}</Link>
       </div>
   

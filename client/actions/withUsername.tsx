@@ -14,10 +14,8 @@ export default function withUsername(Component: NextPage<any, any>) {
     useEffect(() => {
       if (status === 'loading') return;
     
-      const username = Cookies.get('username');
-    
-      if (!username) {
-        router.push('/set-username'); 
+      if (!session?.user.username || !session?.user.isUsernameSet) {
+        router.push('/set-username');
       }
     }, [status, router]);
 

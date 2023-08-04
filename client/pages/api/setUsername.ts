@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { PrismaClient } from '@prisma/client';
 
+
 const prisma = new PrismaClient();
 
 export default async function handler(
@@ -25,8 +26,11 @@ export default async function handler(
         where: { id: userId },
         data: { username, isUsernameSet: true },
       });
-
-      res.status(200).json({ user: updatedUser, success: true });
+      const newToken = {
+        username: updatedUser.username,
+        isUsernameSet: true,
+      };
+      res.status(200).json({ user: updatedUser, success: true, refreshSession: true, token: newToken });
 
     } catch (error: any) {
       if (error.code === 'P2002') {
