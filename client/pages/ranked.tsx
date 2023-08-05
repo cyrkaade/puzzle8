@@ -335,7 +335,7 @@ useEffect(() => {
         3. Состоять из 80 до 180 слов, представляя собой краткое задание.
         4. Логически разрешимой без угадывания, с четким ответом, который не раскрывается в тексте головоломки.
 
-        Для этого запроса создайте головоломку, которая относится к категории ${puzzle_type}. Это может быть задача на сообразительность, математическая головоломка, тайная загадка, задание на невербальное мышление, детективный сценарий или любая другая умственно стимулирующая задача, требующая латерального мышления. Пожалуйста, предоставьте только текст головоломки, убедившись, что он не содержит никаких подсказок или явных решений.`;
+        Для этого запроса создайте головоломку, которая относится к категории ${puzzle_type}. Это может быть задача на сообразительность, математическая головоломка, тайная загадка, задание на невербальное мышление, детективный сценарий или любая другая умственно стимулирующая задача, которая должна иметь конкретный ответ и не быть слишком сложной. Не говорите ничего, а пожалуйста, предоставьте только текст головоломки, убедившись, что он не содержит никаких подсказок или явных решений.`;
       
       }
 
@@ -347,7 +347,7 @@ useEffect(() => {
         3. Comprised of 80 to 180 words, offering a concise challenge.
         4. Logically solvable without guesswork, with a clear answer that is not revealed in the puzzle text.
 
-        For this request, generate a puzzle that falls under the category of ${puzzle_type}. This could be a brainteaser, mathematical conundrum, cryptic riddle, non-verbal reasoning challenge, detective scenario, or any other mentally stimulating task requiring lateral thinking. Please provide only the puzzle text, ensuring that it does not contain any hints or explicit solutions.`;
+        For this request, generate a puzzle that falls under the category of ${puzzle_type}. This could be a brainteaser, mathematical conundrum, cryptic riddle, non-verbal reasoning challenge, detective scenario, or any other mentally stimulating task, that should have exact solution and not be very hard. Don't tell anything, please provide only the puzzle text, ensuring that it does not contain any hints or explicit solutions.`;
 
         
       }
@@ -537,10 +537,10 @@ useEffect(() => {
     const generateAnswer = async () => {
       let answerPrompt = ""
       if (locale==='ru'){
-        answerPrompt = `На основе представленной головоломки, ${generatedPuzzles}, предоставьте краткое и точное решение. Помните, что объяснение не должно превышать 80 слов и оно должно корректно решить головоломку. Избегайте ненужной детализации или несвязанной информации в вашем ответе.`;
+        answerPrompt = `На основе представленной головоломки, ${generatedPuzzles}, предоставьте краткое и точное решение. Помните, что объяснение не должно превышать 40 слов и оно должно корректно решить головоломку. Избегайте ненужной детализации или несвязанной информации в вашем ответе.`;
 
       } else {
-        answerPrompt = `Based on the provided puzzle, ${generatedPuzzles}, provide a succinct and accurate solution. Remember, the explanation should not exceed 80 words and it must correctly resolve the puzzle. Ensure to avoid unnecessary elaboration or unrelated information in your response.`;
+        answerPrompt = `Based on the provided puzzle, ${generatedPuzzles}, provide a succinct and accurate solution. Remember, the explanation should not exceed 40 words and it must correctly resolve the puzzle. Ensure to avoid unnecessary elaboration or unrelated information in your response.`;
 
       }
       setCorrectAnswer("");

@@ -213,23 +213,27 @@ const updateUserData = async () => {
 
       let prompt: string
       if (locale === 'ru'){ 
-        prompt = `Как продвинутый ИИ, создайте уникальную головоломку специально для пользователя со сложностью ${difficulty}/100, типом ${ptype} и стилем ${style}. Эта головоломка должна быть:
+        prompt = `Как продвинутый ИИ, создайте уникальную и разрешимую головоломку специально для пользователя со сложностью ${difficulty}/100 и в ${style} стиле и в типе ${ptype}. Эта головоломка должна быть:
 
         1. Инновационной и необычной, не включающей в себя клишированных тем, таких как "два стража и дилемма ложь/правда".
         2. Соответствующей указанному уровню сложности, привлекая интерес пользователя, не будучи слишком простой или чрезмерно сложной.
-        3. Состоять из 80 до 160 слов, представляя собой краткое задание.
-        
-        Для этого запроса создайте головоломку, которая относится к категории ${ptype}. Это может быть задача на сообразительность, математическая головоломка, тайная загадка, задание на невербальное мышление, детективный сценарий или любая другая умственно стимулирующая задача, требующая латерального мышления. Избегайте явных решений в самом тексте головоломки и выведите только текст головоломки.`;        
+        3. Состоять из 80 до 180 слов, представляя собой краткое задание.
+        4. Логически разрешимой без угадывания, с четким ответом, который не раскрывается в тексте головоломки.
+
+        Для этого запроса создайте головоломку, которая относится к категории ${ptype}. Это может быть задача на сообразительность, математическая головоломка, тайная загадка, задание на невербальное мышление, детективный сценарий или любая другая умственно стимулирующая задача, которая должна иметь конкретный ответ и не быть слишком сложной. Не говорите ничего, а пожалуйста, предоставьте только текст головоломки, убедившись, что он не содержит никаких подсказок или явных решений.`;
+      
       }
 
       else {
-        prompt = `As an advanced AI, create a unique puzzle specifically for a user with a difficulty level of ${difficulty}/100, with type ${ptype} and style ${style}. This puzzle should be:
+        prompt = `As an advanced AI, create a unique and solvable puzzle specifically for a user with a difficulty level of ${difficulty} and in ${style} style and in ${ptype} type. This puzzle should be:
 
         1. Innovative and uncommon, not involving clichéd themes like 'two guards and a lie/truth dilemma'.
         2. Appropriate for the specified difficulty level, engaging the user's interest without being overly simple or excessively complex.
-        3. Comprised of 80 to 160 words, offering a concise challenge.
-        
-        For this request, generate a puzzle that falls under the category of ${ptype}. This could be a brainteaser, mathematical conundrum, cryptic riddle, non-verbal reasoning challenge, detective scenario, or any other mentally stimulating task requiring lateral thinking. Avoid explicit solutions within the puzzle text itself.`;
+        3. Comprised of 80 to 180 words, offering a concise challenge.
+        4. Logically solvable without guesswork, with a clear answer that is not revealed in the puzzle text.
+
+        For this request, generate a puzzle that falls under the category of ${ptype}. This could be a brainteaser, mathematical conundrum, cryptic riddle, non-verbal reasoning challenge, detective scenario, or any other mentally stimulating task, that should have exact solution and not be very hard. Don't tell anything, please provide only the puzzle text, ensuring that it does not contain any hints or explicit solutions.`;
+
         
       }
       setLoadingGenerate(true);
