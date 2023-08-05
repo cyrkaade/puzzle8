@@ -192,20 +192,17 @@ const Ranked: NextPage<{locale: string}> = ({locale}) => {
     useEffect(() => {
       fetch('/api/currentUser')
         .then((res) => res.json())
-        .then((data) => {
+        .then(async (data) => {
           if (data.user) {
             setCurrentUser(data.user);
             setUserPoints(data.user.rating);
-            fetch(`${API_URL}/users/ranking/${data.user.id}`)
-              .then((res) => res.json())
-              .then((data) => setUserRank(data.rank));
+            const response = await fetch(`${API_URL}/users/ranking/${data.user.id}`);
+            const rankData = await response.json();
+            setUserRank(rankData.rank);
             Cookies.remove('generationCount');
           } else {
             router.push('/login');
           }
-          // if (!data.user.isUsernameSet) {
-          //   router.push('/set-username');
-          // }
         });
     }, []);
     

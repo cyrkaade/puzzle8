@@ -104,12 +104,12 @@ const LoginModal = () => {
         icon={FcGoogle}
         onClick={() => signIn('google')}
       />
-      <Button 
+      {/* <Button 
         outline 
         label={t('github_continue')}
         icon={AiFillGithub}
         onClick={() => signIn('github')}
-      />
+      /> */}
       <div className="
       text-neutral-500 text-center mt-4 font-light">
         <p>{t('first_time')}
