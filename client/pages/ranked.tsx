@@ -328,23 +328,27 @@ useEffect(() => {
 
       let prompt: string
       if (locale === 'ru'){ 
-        prompt = `Как продвинутый ИИ, создайте уникальную головоломку специально для пользователя со сложностью ${difficulty}. Эта головоломка должна быть:
+        prompt = `Как продвинутый ИИ, создайте уникальную и разрешимую головоломку специально для пользователя со сложностью ${difficulty}. Эта головоломка должна быть:
 
         1. Инновационной и необычной, не включающей в себя клишированных тем, таких как "два стража и дилемма ложь/правда".
         2. Соответствующей указанному уровню сложности, привлекая интерес пользователя, не будучи слишком простой или чрезмерно сложной.
         3. Состоять из 80 до 180 слов, представляя собой краткое задание.
-        
-        Для этого запроса создайте головоломку, которая относится к категории ${puzzle_type}. Это может быть задача на сообразительность, математическая головоломка, тайная загадка, задание на невербальное мышление, детективный сценарий или любая другая умственно стимулирующая задача, требующая латерального мышления. Избегайте явных решений в самом тексте головоломки и выведите только текст головоломки.`;        
+        4. Логически разрешимой без угадывания, с четким ответом, который не раскрывается в тексте головоломки.
+
+        Для этого запроса создайте головоломку, которая относится к категории ${puzzle_type}. Это может быть задача на сообразительность, математическая головоломка, тайная загадка, задание на невербальное мышление, детективный сценарий или любая другая умственно стимулирующая задача, требующая латерального мышления. Пожалуйста, предоставьте только текст головоломки, убедившись, что он не содержит никаких подсказок или явных решений.`;
+      
       }
 
       else {
-        prompt = `As an advanced AI, create a unique puzzle specifically for a user with a difficulty level of ${difficulty}. This puzzle should be:
+        prompt = `As an advanced AI, create a unique and solvable puzzle specifically for a user with a difficulty level of ${difficulty}. This puzzle should be:
 
         1. Innovative and uncommon, not involving clichéd themes like 'two guards and a lie/truth dilemma'.
         2. Appropriate for the specified difficulty level, engaging the user's interest without being overly simple or excessively complex.
         3. Comprised of 80 to 180 words, offering a concise challenge.
-        
-        For this request, generate a puzzle that falls under the category of ${puzzle_type}. This could be a brainteaser, mathematical conundrum, cryptic riddle, non-verbal reasoning challenge, detective scenario, or any other mentally stimulating task requiring lateral thinking. Avoid explicit solutions within the puzzle text itself.`;
+        4. Logically solvable without guesswork, with a clear answer that is not revealed in the puzzle text.
+
+        For this request, generate a puzzle that falls under the category of ${puzzle_type}. This could be a brainteaser, mathematical conundrum, cryptic riddle, non-verbal reasoning challenge, detective scenario, or any other mentally stimulating task requiring lateral thinking. Please provide only the puzzle text, ensuring that it does not contain any hints or explicit solutions.`;
+
         
       }
       setLoadingGenerate(true);
@@ -366,7 +370,7 @@ useEffect(() => {
           prompt,
         }),
       })
-      setTimer(150);
+      setTimer(120);
       setDisableButton(false);
       setTimerMessage("");
       
