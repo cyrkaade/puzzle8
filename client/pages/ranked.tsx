@@ -782,14 +782,6 @@ useEffect(() => {
   
     const session = await getSession({ req });
   
-    // if (!session) {
-    //   return {
-    //     redirect: {
-    //       destination: '/?loginRequired=true',
-    //       permanent: false,
-    //     },
-    //   }
-    // }
   
     return {
       props: {
