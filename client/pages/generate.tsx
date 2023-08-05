@@ -24,7 +24,7 @@ import { getSession } from "next-auth/react";
 import { useRouter } from "next/router";
 
 
-const API_URL = process.env.API_URL;
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 interface PuzzleItemProps {
     generatedpuzzle: string;

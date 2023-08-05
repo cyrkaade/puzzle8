@@ -62,7 +62,7 @@ export type Favorite = {
 }
 
 
-const API_URL = process.env.API_URL;
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 import { withClientSideRendering } from "../actions/withClientSideRendering"
 import withUsername from "../actions/withUsername"

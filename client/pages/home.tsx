@@ -10,7 +10,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
-const API_URL = process.env.API_URL;
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 const Home: NextPage = () => {
     const [currentUser, setCurrentUser] = useState(null);
