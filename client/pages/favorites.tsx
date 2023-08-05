@@ -333,7 +333,7 @@ const deleteFavorites = async () => {
   })
  
   return (
-    <div>
+    <div className="bg-white">
       <Head>
             <title>sherlck.</title>
           <link rel="icon" href="/reallogo.ico" />
