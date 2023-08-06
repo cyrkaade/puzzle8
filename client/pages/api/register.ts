@@ -2,13 +2,23 @@ import { NextResponse } from "next/server";
 import bcrypt from "bcrypt";
 import type { NextApiRequest, NextApiResponse } from 'next'
 import prisma from "../../libs/prismadb"
-import i18next from "i18next";
-import Backend from "i18next-fs-backend";
-import path from "path"
+import i18next from 'i18next';
+import Backend from 'i18next-fs-backend';
 
+// i18n configuration
+i18next
+  .use(Backend)
+  .init({
+    fallbackLng: 'en',
+    ns: ['common'],
+    defaultNS: 'common',
+    backend: {
+      loadPath: './public/locales/{{lng}}/{{ns}}.json',
+    },
+  });
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-
+  const lng = req.body.lng || req.headers['accept-language'] || 'en';
   if (req.method === 'POST') {
     let { username, email, password } = req.body;
 
@@ -16,10 +26,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     email = email.trim();
     password = password.trim();
 
-    
-
     if (!/^[a-zA-Z0-9]{4,16}$/.test(username)) {
-      return res.status(400).json({ message: 'Username should be 4-16 characters long and contain only English letters and numbers without spaces.' });
+      return res.status(400).json({ message: await i18next.t('username_characters_error', { lng }) });
     }
     
 
@@ -30,7 +38,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     });
 
     if (existingUsername) {
-      return res.status(409).json({ message: 'Username already taken.' });
+      return res.status(409).json({ message: await i18next.t('already_taken', { lng }) });
     }
 
     const existingEmail = await prisma.user.findUnique({
@@ -40,11 +48,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     });
 
     if (existingEmail) {
-      return res.status(409).json({ message: 'Email already registered.' });
+      return res.status(409).json({ message: await i18next.t('already_registered', { lng }) });
     }
 
     if (!/^.{8,}$/.test(password)) {
-      return res.status(400).json({ message: 'Password should be at least 8 characters long.' });
+      return res.status(400).json({ message: await i18next.t('password_validation', { lng }) });
     }
 
     const hashedPassword = await bcrypt.hash(password, 12);
