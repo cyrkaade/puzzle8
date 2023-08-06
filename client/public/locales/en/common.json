@@ -82,7 +82,7 @@
     "username_description": "From 4 to 16 characters without special symbols.",
 
     "save": "Save",
-    "warning": "Username should be 4-16 characters long and contain only lowercase letters and numbers.",
+    "warning": "Username should be 4-16 characters long and contain only English letters and numbers without spaces.",
 
     "riddle_description":"A riddle is a statement or question with a double or hidden meaning that constitutes a puzzle to be solved. Often used in folklore or as brainteasers, riddles require creative thinking and the application of lateral thinking skills to figure out the answer.",
     "logical_description":"Logical puzzles, also known as logic problems, require the solver to deduce the correct answer using deductive reasoning from a given set of statements. These puzzles are typically presented in the form of a story, and solvers must analyze the information, make logical inferences, and arrive at a solution that obeys all the given conditions.",
@@ -165,7 +165,11 @@
 "generate": "Generate",
 "return": "Back to home page",
 "Random": "Random",
-"timeout": "Time went out"
+"timeout": "Time went out",
+"already_taken": "Username already taken",
+"already_registered": "Email already registered.",
+"password_validation": "Password should be at least 8 characters long.",
+"username_characters_error": "Username should be 4-16 characters long and contain only English letters and numbers without spaces."
 
 
   }
