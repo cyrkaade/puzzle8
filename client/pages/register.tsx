@@ -53,9 +53,9 @@ type FormData = {
     const onSubmit: SubmitHandler<FormData> = (data) => {
       setIsLoading(true);
 
-      const postData = { ...data, lng: router.locale };
+    
   
-      axios.post('/api/register', postData)
+      axios.post('/api/register', data)
       .then(() => {
         toast.success(`${t('registered')}`);
         router.push('/login');
