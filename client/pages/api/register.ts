@@ -12,7 +12,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     password = password.trim();
 
     if (!/^[a-zA-Z0-9]{4,16}$/.test(username)) {
-      return res.status(400).json({ message: 'Username should be 4-16 characters long and contain only English letters and numbers without spaces.' });
+      return res.status(400).json({ message: 'Username should be 4-16 characters long and contain only letters and numbers without spaces.' });
     }
     
 

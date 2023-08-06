@@ -52,8 +52,6 @@ type FormData = {
   
     const onSubmit: SubmitHandler<FormData> = (data) => {
       setIsLoading(true);
-
-    
   
       axios.post('/api/register', data)
       .then(() => {
