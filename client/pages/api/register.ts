@@ -11,17 +11,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   if (req.method === 'POST') {
     let { username, email, password } = req.body;
-    const i18n = i18next.createInstance();
-
-    await i18n.use(Backend).init({
-      initImmediate: false,
-      lng: req.body.locale || "en", 
-      fallbackLng: "en", 
-      ns: ["common"], 
-      backend: {
-        loadPath: path.join(process.cwd(), "public/locales/{{lng}}/{{ns}}.json"),
-      },
-    });
 
     username = username.trim();
     email = email.trim();
@@ -30,7 +19,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     
 
     if (!/^[a-zA-Z0-9]{4,16}$/.test(username)) {
-      return res.status(400).json({ message: i18n.t('username_characters_error') });
+      return res.status(400).json({ message: 'Username should be 4-16 characters long and contain only English letters and numbers without spaces.' });
     }
     
 
@@ -41,7 +30,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     });
 
     if (existingUsername) {
-      return res.status(409).json({ message: i18n.t('already_taken') });
+      return res.status(409).json({ message: 'Username already taken.' });
     }
 
     const existingEmail = await prisma.user.findUnique({
@@ -51,11 +40,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     });
 
     if (existingEmail) {
-      return res.status(409).json({ message: i18n.t('already_registered') });
+      return res.status(409).json({ message: 'Email already registered.' });
     }
 
     if (!/^.{8,}$/.test(password)) {
-      return res.status(400).json({ message: i18n.t('password_validation') });
+      return res.status(400).json({ message: 'Password should be at least 8 characters long.' });
     }
 
     const hashedPassword = await bcrypt.hash(password, 12);
