@@ -16,7 +16,7 @@ const Benefits = (props:any) => {
           className={`flex items-center justify-center w-full lg:w-1/2 ${
             props.imgPos === "right" ? "lg:order-1" : ""
           }`}>
-          <div className="w-full sm:w-4/5 md:w-3/4 lg:w-full bg-gray-200 p-8 rounded-xl shadow-lg">
+          <div className="w-full sm:w-4/5 md:w-3/4 lg:w-full bg-orange-200 p-8 rounded-xl shadow-lg">
             <TestGeneration/>
           </div>
         </div>

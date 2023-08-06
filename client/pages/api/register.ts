@@ -36,8 +36,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(409).json({ message: 'Email already registered.' });
     }
 
-    if (!/^(?=.*[A-Za-z])[A-Za-z\d$@$!%*#?&]{8,}$/.test(password)) {
-      return res.status(400).json({ message: 'Password should be at least 8 characters long and contain at least one letter.' });
+    if (!/^.{8,}$/.test(password)) {
+      return res.status(400).json({ message: 'Password should be at least 8 characters long.' });
     }
 
     const hashedPassword = await bcrypt.hash(password, 12);

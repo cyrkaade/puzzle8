@@ -3,7 +3,7 @@ import { AiFillGithub } from "react-icons/ai";
 import { signIn } from "next-auth/react";
 import { FcGoogle } from "react-icons/fc";
 import { useEffect, useState } from "react";
-import { toast } from "react-hot-toast";
+import { toast, Toaster } from "react-hot-toast";
 import { SubmitHandler, UseFormRegister, useForm } from "react-hook-form";
 import { useTranslation } from 'next-i18next';
 import { useRouter } from "next/router";
@@ -71,6 +71,29 @@ type FormData = {
     }
 
   return (
+    <>
+<Toaster
+  position="top-right"
+  reverseOrder={false}
+  toastOptions={{
+    // Define default options
+    style: {
+      margin: '40px',
+      background: '#363636',
+      color: '#fff',
+      zIndex: 1,
+    },
+    duration: 5000,
+    success: {
+      // Override options for success toasts
+      style: {
+        background: 'green',
+        color: 'black',
+      },
+      duration: 3000,
+    },
+  }}
+/>
     <div className="bg-white min-h-screen flex justify-center items-center">
       <div className="flex flex-col max-w-2xl w-full p-8 bg-white border border-gray-200 shadow-lg rounded-lg">
         <form onSubmit={handleSubmit(onSubmit)}>
@@ -142,6 +165,7 @@ type FormData = {
         </form>
       </div>
     </div>
+    </>
   );
 }
 

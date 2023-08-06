@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { toast } from "react-hot-toast";
+import { Toaster, toast } from "react-hot-toast";
 import { signIn } from 'next-auth/react';
 import { 
   FieldValues, 
@@ -69,6 +69,29 @@ const LoginPage = () => {
   }
 
   return (
+    <>
+    <Toaster
+  position="top-right"
+  reverseOrder={false}
+  toastOptions={{
+    // Define default options
+    style: {
+      margin: '40px',
+      background: '#363636',
+      color: '#fff',
+      zIndex: 1,
+    },
+    duration: 5000,
+    success: {
+      // Override options for success toasts
+      style: {
+        background: 'green',
+        color: 'black',
+      },
+      duration: 3000,
+    },
+  }}
+/>
     <div className="bg-white min-h-screen flex justify-center items-center">
       <div className="flex flex-col max-w-2xl w-full p-8 bg-white border border-gray-200 shadow-lg rounded-lg">
         <form onSubmit={handleSubmit(onSubmit)}>
@@ -127,6 +150,7 @@ const LoginPage = () => {
         </form>
       </div>
     </div>
+    </>
   );
 }
 
