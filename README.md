@@ -50,6 +50,11 @@ sherlck is an advanced AI-powered puzzle generation platform that allows users t
    cd server
    ```
 
+   Install the requirements:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
    Run the FastAPI server:
    ```bash
    uvicorn main:app --reload
