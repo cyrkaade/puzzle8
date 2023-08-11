@@ -14,8 +14,6 @@ sherlck is an advanced AI-powered puzzle generation platform that allows users t
 
 <p align="center">
   <a href="https://youtu.be/DusZlzNnpm4">
-    <img src="./client/public/thimbnail.png" alt="Demo Video Thumbnail">
-    <br>
     Check out the Demo!
   </a>
 </p>
