@@ -2,6 +2,24 @@
 
 sherlck is an advanced AI-powered puzzle generation platform that allows users to create puzzles, compete worldwide, and manage their favorite puzzles. With a slick user dashboard and secure authentication, sherlck promises an engaging user experience.
 
+Certainly! Here's an adjusted section of the `README` that includes the "Check out Demo" part with a placeholder for your demo video:
+
+---
+
+# sherlck
+
+sherlck is an advanced AI-powered puzzle generation platform that allows users to create puzzles, compete worldwide, and manage their favorite puzzles. With a slick user dashboard and secure authentication, sherlck promises an engaging user experience.
+
+## Demo:
+
+<p align="center">
+  <a href="https://youtu.be/DusZlzNnpm4">
+    <img src="https://yourimageshare.com/ib/FwL89Uhyxl" alt="Demo Video Thumbnail">
+    <br>
+    Check out the Demo!
+  </a>
+</p>
+
 ## Features:
 
 1. **AI-Powered Puzzle Generation**: Innovative puzzles created using the power of Artificial Intelligence.
@@ -11,6 +29,7 @@ sherlck is an advanced AI-powered puzzle generation platform that allows users t
 5. **Worldwide Competition**: Compete with puzzle enthusiasts from around the world and climb up the ranks.
 6. **Landing Page**: An aesthetically pleasing landing page to welcome users.
 7. **User Dashboard**: Once registered, users are presented with a comprehensive dashboard on the home page.
+8. **2 Languages**: English and Russian
 
 ## Setup:
 
